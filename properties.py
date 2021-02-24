@@ -20,7 +20,7 @@ class PUPT_PR_automation(bpy.types.PropertyGroup) :
 
     key_assignment : bpy.props.StringProperty(name = "Key")
 
-    automation_keyframes : bpy.props.CollectionProperty(
+    keyframe : bpy.props.CollectionProperty(
         name = "Keyframes",
         type = PUPT_PR_automation_keyframe,
         )

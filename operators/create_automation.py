@@ -4,6 +4,7 @@ import bpy
 from .automation_set_actions import add_item_to_collection
 
 
+# enum callback for automation set
 def automation_set_callback(scene, context):
 
     items = [
@@ -16,6 +17,51 @@ def automation_set_callback(scene, context):
 
     return items
 
+
+# return keyframes
+def return_selected_keyframes(fcurve):
+
+    keyframes = []
+
+    for kf in fcurve.keyframe_points:
+        if kf.select_control_point:
+            keyframes.append(kf)
+
+    return sorted(keyframes, key=lambda x: x.co[0])
+
+
+# keyframe infos
+def return_keyframes_infos(context):
+
+    keyframes = []
+    keyframes_infos = []
+
+    for fc in context.visible_fcurves:
+        
+        for kf in return_selected_keyframes(fc):
+
+            keyframes.append((kf, fc))
+
+    origin_frame = min(keyframes, key=lambda item: item[0].co[0]).co[0]
+
+
+
+# add keyframes in collection
+def add_keyframes_to_collection(keyframes, collection):
+
+    for fc in context.visible_fcurves:
+        
+        for kf in return_selected_keyframes(fc):
+
+            new_key = collection.keyframe.add()
+
+            new_key.fcurve_data_path = fc.data_path
+            new_key.fcurve_array_index = fc.array_index
+            new_key.fcurve_frame = int(kf.co[0])
+            new_key.fcurve_value = kf.co[1]
+
+            #new_key.fcurve_additive_value
+           
 
 class PUPT_OT_Create_Automation(bpy.types.Operator):
     bl_idname = "pupt.create_automation"
@@ -36,7 +82,6 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
     def poll(cls, context):
         return True
  
-
     def invoke(self, context, event):
         pupt_props = context.scene.pupt_properties
         idx = pupt_props.automation_set_index
@@ -47,7 +92,6 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
 
         return context.window_manager.invoke_props_dialog(self)
  
-
     def draw(self, context):
         self.layout.prop(self, "automation_set")
 
@@ -56,7 +100,6 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
 
         self.layout.prop(self, "automation_name")
         
-
     def execute(self, context):
 
         pupt_props = context.scene.pupt_properties
@@ -76,6 +119,11 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
 
         # create automation
         new_automation = add_item_to_collection(active_set.automation, self.automation_name)
+
+        # get keyframes in collection
+        keyframes = return_keyframes_infos(context)
+        add_keyframes_to_collection(keyframes, new_automation)
+
 
         # refresh ui
         for area in context.screen.areas:
