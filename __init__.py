@@ -45,6 +45,7 @@ from . import   (
 
 from .operators import (
     automation_set_actions,
+    automation_actions,
     create_automation,
 )
 
@@ -61,6 +62,7 @@ def register():
     ui_lists.register()
 
     automation_set_actions.register()
+    automation_actions.register()
     create_automation.register()
 
 def unregister():
@@ -71,4 +73,5 @@ def unregister():
     ui_lists.unregister()
 
     automation_set_actions.unregister()
+    automation_actions.unregister()
     create_automation.unregister()

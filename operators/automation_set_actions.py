@@ -19,6 +19,8 @@ def add_item_to_collection(collection, base_name):
     #add
     new_set = collection.add()
     new_set.name = new_name
+
+    return new_set
     
 
 class PUPT_OT_Automation_Set_Actions(bpy.types.Operator):
@@ -32,7 +34,9 @@ class PUPT_OT_Automation_Set_Actions(bpy.types.Operator):
             ('UP', "Up", ""),
             ('DOWN', "Down", ""),
             ('REMOVE', "Remove", ""),
-            ('ADD', "Add", "")))
+            ('ADD', "Add", ""),
+            )
+        )
 
     @classmethod
     def poll(cls, context):

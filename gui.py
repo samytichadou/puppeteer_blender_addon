@@ -32,6 +32,24 @@ class PUPT_PT_viewport_panel(bpy.types.Panel):
         col.operator("pupt.automation_set_actions", icon='TRIA_UP', text="").action = 'UP'
         col.operator("pupt.automation_set_actions", icon='TRIA_DOWN', text="").action = 'DOWN'
 
+        # automations
+        if props.automation_set_index in range(0, len(props.automation_set)):
+
+            active_set = props.automation_set[props.automation_set_index]
+
+            layout.label(text = "Automations")
+
+            row = layout.row()
+
+            row.template_list("PUPT_UL_automation", "", active_set, "automation", active_set, "automation_index", rows = 4)
+
+            col = row.column(align=True)
+            col.operator("pupt.automation_actions", icon='REMOVE', text="").action = 'REMOVE'
+            col.separator()
+            col.operator("pupt.automation_actions", icon='TRIA_UP', text="").action = 'UP'
+            col.operator("pupt.automation_actions", icon='TRIA_DOWN', text="").action = 'DOWN'
+
+
 
 ### REGISTER ---
 

@@ -1,6 +1,8 @@
 import bpy
 
+
 from .automation_set_actions import add_item_to_collection
+
 
 def automation_set_callback(scene, context):
 
@@ -28,7 +30,7 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
 
     new_automation_set_name : bpy.props.StringProperty(name = "Set name", default = "new_set")
 
-    automation_name : bpy.props.StringProperty(name = "Automation name", default = "New automation")
+    automation_name : bpy.props.StringProperty(name = "Automation name", default = "new_automation")
 
     @classmethod
     def poll(cls, context):
@@ -65,7 +67,15 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
             add_item_to_collection(sets, self.new_automation_set_name)
             
             pupt_props.automation_set_index = len(sets) - 1
-            
+
+            active_set = sets[pupt_props.automation_set_index]
+
+        else:
+
+            active_set = sets[self.automation_set]
+
+        # create automation
+        new_automation = add_item_to_collection(active_set.automation, self.automation_name)
 
         # refresh ui
         for area in context.screen.areas:
