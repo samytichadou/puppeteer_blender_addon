@@ -37,9 +37,16 @@ import bpy
 ##################################
 
 from . import   (
-                addon_prefs,
-                properties,
-                )
+    addon_prefs,
+    properties,
+    gui,
+    ui_lists,
+)
+
+from .operators import (
+    automation_set_actions,
+    create_automation,
+)
 
 
 # register
@@ -50,8 +57,18 @@ def register():
 
     addon_prefs.register()
     properties.register()
+    gui.register()
+    ui_lists.register()
+
+    automation_set_actions.register()
+    create_automation.register()
 
 def unregister():
 
     addon_prefs.unregister()
     properties.unregister()
+    gui.unregister()
+    ui_lists.unregister()
+
+    automation_set_actions.unregister()
+    create_automation.unregister()
