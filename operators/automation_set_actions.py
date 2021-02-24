@@ -19,12 +19,12 @@ def add_item_to_collection(collection, base_name):
     #add
     new_set = collection.add()
     new_set.name = new_name
-
+    
 
 class PUPT_OT_Automation_Set_Actions(bpy.types.Operator):
     bl_idname = "pupt.automation_set_actions"
     bl_label = "Set actions"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = {"REGISTER", "UNDO", "INTERNAL"}
     bl_description = "Puppeteer automation set actions"
 
     action = bpy.props.EnumProperty(
@@ -48,7 +48,6 @@ class PUPT_OT_Automation_Set_Actions(bpy.types.Operator):
         if self.action == "ADD":
             add_item_to_collection(sets, "new_set")
 
-            #set index update
             pupt_props.automation_set_index = len(sets) - 1
 
             self.report({'INFO'}, "Automation set created")
@@ -88,7 +87,7 @@ class PUPT_OT_Automation_Set_Actions(bpy.types.Operator):
             self.report({'INFO'}, "No set selected")
             return {'FINISHED'}
 
-        #refresh ui
+        # refresh ui
         for area in context.screen.areas:
             area.tag_redraw()
 

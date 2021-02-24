@@ -1,5 +1,6 @@
 import bpy
 
+from .automation_set_actions import add_item_to_collection
 
 def automation_set_callback(scene, context):
 
@@ -25,7 +26,7 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
         items = automation_set_callback,
         )
 
-    new_automation_set_name : bpy.props.StringProperty(name = "Set name", default = "New set")
+    new_automation_set_name : bpy.props.StringProperty(name = "Set name", default = "new_set")
 
     automation_name : bpy.props.StringProperty(name = "Automation name", default = "New automation")
 
@@ -33,6 +34,7 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
     def poll(cls, context):
         return True
  
+
     def invoke(self, context, event):
         pupt_props = context.scene.pupt_properties
         idx = pupt_props.automation_set_index
@@ -43,6 +45,7 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
 
         return context.window_manager.invoke_props_dialog(self)
  
+
     def draw(self, context):
         self.layout.prop(self, "automation_set")
 
@@ -51,12 +54,20 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
 
         self.layout.prop(self, "automation_name")
         
+
     def execute(self, context):
 
         pupt_props = context.scene.pupt_properties
-        automation_sets = pupt_props.automation_set
+        sets = pupt_props.automation_set
 
-        #refresh ui
+        # create new set if needed
+        if self.automation_set == "CREATE_NEW":
+            add_item_to_collection(sets, self.new_automation_set_name)
+            
+            pupt_props.automation_set_index = len(sets) - 1
+            
+
+        # refresh ui
         for area in context.screen.areas:
             area.tag_redraw()
 

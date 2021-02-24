@@ -23,7 +23,7 @@ class PUPT_PT_viewport_panel(bpy.types.Panel):
 
         row = layout.row()
 
-        row.template_list("PUPT_UL_automation_set", "", props, "automation_set", props, "automation_set_index", rows = 3)
+        row.template_list("PUPT_UL_automation_set", "", props, "automation_set", props, "automation_set_index", rows = 4)
 
         col = row.column(align=True)
         col.operator("pupt.automation_set_actions", icon='ADD', text="").action = 'ADD'
