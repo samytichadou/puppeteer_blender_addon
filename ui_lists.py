@@ -21,12 +21,12 @@ class PUPT_UL_automation(bpy.types.UIList):
 
         if self.layout_type in {'DEFAULT', 'COMPACT'}: 
             layout.prop(item, "name", text="", emboss=False)
-            layout.prop(item, "key_assignment", text="")
+            # layout.prop(item, "key_assignment", text="")
             
         elif self.layout_type in {'GRID'}: 
             layout.alignment = 'CENTER' 
             layout.prop(item, "name", text="", emboss=False)
-            layout.prop(item, "key_assignment", text="")
+            # layout.prop(item, "key_assignment", text="")
 
 
 ### REGISTER ---
