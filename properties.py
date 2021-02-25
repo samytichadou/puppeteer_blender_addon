@@ -7,6 +7,8 @@ class PUPT_PR_automation_keyframe(bpy.types.PropertyGroup) :
     object_name : bpy.props.StringProperty(name = "Object Name")
     object_type : bpy.props.StringProperty(name = "Object Type")
 
+    action_name : bpy.props.StringProperty(name = "Action Name")
+
     fcurve_data_path : bpy.props.StringProperty(name = "Fcurve Data Path")
     fcurve_array_index : bpy.props.IntProperty(name = "Fcurve Array Index")
 

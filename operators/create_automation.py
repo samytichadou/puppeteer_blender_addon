@@ -31,10 +31,9 @@ def return_selected_keyframes(fcurve):
 
 
 # keyframe infos
-def return_keyframes_infos(context):
+def add_keyframes_to_collection(context, collection):
 
     keyframes = []
-    keyframes_infos = []
 
     for fc in context.visible_fcurves:
         
@@ -42,26 +41,24 @@ def return_keyframes_infos(context):
 
             keyframes.append((kf, fc))
 
-    origin_frame = min(keyframes, key=lambda item: item[0].co[0]).co[0]
+    origin_frame = min(keyframes, key=lambda item: item[0].co[0])[0].co[0]
 
+    for item in keyframes:
+        new_key = collection.keyframe.add()
 
+        #new_key.object_name = 
+        new_key.object_type = item[1].id_data.id_root
 
-# add keyframes in collection
-def add_keyframes_to_collection(keyframes, collection):
+        new_key.action_name = item[1].id_data.name
 
-    for fc in context.visible_fcurves:
-        
-        for kf in return_selected_keyframes(fc):
+        new_key.fcurve_data_path = item[1].data_path
+        new_key.fcurve_array_index = item[1].array_index
 
-            new_key = collection.keyframe.add()
+        new_key.fcurve_frame = int(item[0].co[0] - origin_frame)
+        new_key.fcurve_value = item[0].co[1]
 
-            new_key.fcurve_data_path = fc.data_path
-            new_key.fcurve_array_index = fc.array_index
-            new_key.fcurve_frame = int(kf.co[0])
-            new_key.fcurve_value = kf.co[1]
-
-            #new_key.fcurve_additive_value
-           
+        #new_key.fcurve_additive_value = 
+          
 
 class PUPT_OT_Create_Automation(bpy.types.Operator):
     bl_idname = "pupt.create_automation"
@@ -121,8 +118,8 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
         new_automation = add_item_to_collection(active_set.automation, self.automation_name)
 
         # get keyframes in collection
-        keyframes = return_keyframes_infos(context)
-        add_keyframes_to_collection(keyframes, new_automation)
+        add_keyframes_to_collection(context, new_automation)
+        #add_keyframes_to_collection(keyframes, new_automation)
 
 
         # refresh ui
