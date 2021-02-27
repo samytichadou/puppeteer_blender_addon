@@ -4,8 +4,18 @@ import bpy
 class PUPT_PR_automation_keyframe(bpy.types.PropertyGroup) :
     '''name : StringProperty() '''
 
-    parent_name : bpy.props.StringProperty(name = "Object Name")
-    parent_type : bpy.props.StringProperty(name = "Object Type")
+    parent_name : bpy.props.StringProperty(name = "Parent Name")
+    parent_type = bpy.props.EnumProperty(
+        name = "Parent Type",
+        items=(
+            ('OBJECT', "Object", ""),
+            ('MATERIAL', "Material", ""),
+            ('MATERIAL_NTREE', "Material NTree", ""),
+            ('WORLD', "World", ""),
+            ('WORLD_NTREE', "World NTree", ""),
+            ),
+        )
+    parent_subtype : bpy.props.StringProperty(name = "Parent Subtype")
 
     action_name : bpy.props.StringProperty(name = "Action Name")
 
@@ -15,6 +25,8 @@ class PUPT_PR_automation_keyframe(bpy.types.PropertyGroup) :
     fcurve_frame : bpy.props.IntProperty(name = "Fcurve Frame")
     fcurve_value : bpy.props.FloatProperty(name = "Fcurve Value")
     fcurve_additive_value : bpy.props.FloatProperty(name = "Fcurve Additive Value")
+
+    show_details : bpy.props.BoolProperty(name = "Show Details")
 
 
 class PUPT_PR_automation(bpy.types.PropertyGroup) :
@@ -26,6 +38,8 @@ class PUPT_PR_automation(bpy.types.PropertyGroup) :
         name = "Keyframes",
         type = PUPT_PR_automation_keyframe,
         )
+
+    show_keyframes : bpy.props.BoolProperty(name = "Show Keyframes")
 
 
 class PUPT_PR_automation_set(bpy.types.PropertyGroup) :

@@ -49,6 +49,45 @@ class PUPT_PT_viewport_panel(bpy.types.Panel):
             col.operator("pupt.automation_actions", icon='TRIA_UP', text="").action = 'UP'
             col.operator("pupt.automation_actions", icon='TRIA_DOWN', text="").action = 'DOWN'
 
+            # automation details
+            if active_set.automation_index in range(0, len(active_set.automation)):
+
+                active_automation = active_set.automation[active_set.automation_index]
+
+                layout.prop(active_automation, "key_assignment")
+
+                # keyframes
+                if active_automation.show_keyframes:
+                    show_kf_icon = "DISCLOSURE_TRI_DOWN"
+                else:
+                    show_kf_icon = "DISCLOSURE_TRI_RIGHT"
+                row = layout.row(align=True)
+                row.prop(active_automation, "show_keyframes", text = "", icon = show_kf_icon, emboss = False)
+                row.label(text = str(len(active_automation.keyframe)) + " keyframes")
+                
+                if active_automation.show_keyframes:
+
+                    for kf in active_automation.keyframe:
+
+                        if kf.show_details:
+                            show_kf_d_icon = "DISCLOSURE_TRI_DOWN"
+                        else:
+                            show_kf_d_icon = "DISCLOSURE_TRI_RIGHT"
+                        row = layout.row(align=True)
+                        row.prop(kf, "show_details", text = "", icon = show_kf_d_icon, emboss = False)
+                        row.label(text = kf.parent_name)
+
+                        # keyframe details
+                        if kf.show_details:
+                            layout.label(text="details")
+
+                        # split = layout.split()
+                        # subcol1 = split.column(align=True)
+                        # subcol2 = split.column(align=True)
+
+                        # subcol1.label(text = kf.fcurve_data_path)
+                        # subcol2.label(text = "Frame" + str(kf.fcurve_frame))
+
 
 
 ### REGISTER ---

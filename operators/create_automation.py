@@ -30,7 +30,7 @@ def return_selected_keyframes(fcurve):
     return sorted(keyframes, key=lambda x: x.co[0])
 
 
-# get first frame of selected keyframes
+# get first keyframe in time out of a list
 def get_init_keyframe(keyframe_list):
     
     original_frame = min(keyframe_list, key=lambda item: item.co[0])
@@ -45,23 +45,32 @@ def return_parent_action(context, action):
     for ob in context.scene.objects:
         if ob.animation_data:
             if action == ob.animation_data.action:
-                return ob
+                return ob, "OBJECT"
 
     # materials and nodetree
     for ma in bpy.data.materials:
         # materials
         if ma.animation_data:
             if action == ma.animation_data.action:
-                return ma
+                return ma, "MATERIAL"
         # nodetree
         if not ma.is_grease_pencil:
             if ma.node_tree.animation_data:
                 if action == ma.node_tree.animation_data.action:
-                    return ma
+                    return ma, "MATERIAL_NTREE"
 
-    # worlds
+    # worlds and nodetree
+    for wo in bpy.data.worlds:
+        # worlds
+        if wo.animation_data:
+            if action == wo.animation_data.action:
+                return wo, "WORLD"
+        # nodetree
+        if wo.node_tree.animation_data:
+            if action == wo.node_tree.animation_data.action:
+                return wo, "WORLD_NTREE"
 
-    return None
+    return None, None
 
 
 # keyframe infos
@@ -83,7 +92,7 @@ def add_keyframes_to_collection(context, collection):
             init_value = init_keyframe.co[1]
 
             # get parent action
-            parent_action = return_parent_action(context, fc.id_data)
+            parent_action, parent_type = return_parent_action(context, fc.id_data)
 
             for kf in fc_keyframes:
 
@@ -91,7 +100,8 @@ def add_keyframes_to_collection(context, collection):
 
                 if parent_action is not None:
                     new_key.parent_name = parent_action.name
-                new_key.parent_type = fc.id_data.id_root
+                    new_key.parent_type = parent_type
+                new_key.parent_subtype = fc.id_data.id_root
 
                 new_key.action_name = fc.id_data.name
 
