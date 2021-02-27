@@ -4,8 +4,8 @@ import bpy
 class PUPT_PR_automation_keyframe(bpy.types.PropertyGroup) :
     '''name : StringProperty() '''
 
-    object_name : bpy.props.StringProperty(name = "Object Name")
-    object_type : bpy.props.StringProperty(name = "Object Type")
+    parent_name : bpy.props.StringProperty(name = "Object Name")
+    parent_type : bpy.props.StringProperty(name = "Object Type")
 
     action_name : bpy.props.StringProperty(name = "Action Name")
 

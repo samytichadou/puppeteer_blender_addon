@@ -30,34 +30,84 @@ def return_selected_keyframes(fcurve):
     return sorted(keyframes, key=lambda x: x.co[0])
 
 
+# get first frame of selected keyframes
+def get_init_keyframe(keyframe_list):
+    
+    original_frame = min(keyframe_list, key=lambda item: item.co[0])
+
+    return original_frame
+
+
+# return action/parent list
+def return_parent_action(context, action):
+
+    # objects
+    for ob in context.scene.objects:
+        if ob.animation_data:
+            if action == ob.animation_data.action:
+                return ob
+
+    # materials and nodetree
+    for ma in bpy.data.materials:
+        # materials
+        if ma.animation_data:
+            if action == ma.animation_data.action:
+                return ma
+        # nodetree
+        if not ma.is_grease_pencil:
+            if ma.node_tree.animation_data:
+                if action == ma.node_tree.animation_data.action:
+                    return ma
+
+    # worlds
+
+    return None
+
+
 # keyframe infos
 def add_keyframes_to_collection(context, collection):
 
-    keyframes = []
+    fc_keyframes = []
+    frames = []
 
     for fc in context.visible_fcurves:
-        
-        for kf in return_selected_keyframes(fc):
 
-            keyframes.append((kf, fc))
+        fc_keyframes.clear()       
+        fc_keyframes = return_selected_keyframes(fc)
 
-    origin_frame = min(keyframes, key=lambda item: item[0].co[0])[0].co[0]
+        if fc_keyframes:
 
-    for item in keyframes:
-        new_key = collection.keyframe.add()
+            #get initial frame/value
+            init_keyframe = get_init_keyframe(fc_keyframes)
+            frames.append(init_keyframe.co[0])
+            init_value = init_keyframe.co[1]
 
-        #new_key.object_name = 
-        new_key.object_type = item[1].id_data.id_root
+            # get parent action
+            parent_action = return_parent_action(context, fc.id_data)
 
-        new_key.action_name = item[1].id_data.name
+            for kf in fc_keyframes:
 
-        new_key.fcurve_data_path = item[1].data_path
-        new_key.fcurve_array_index = item[1].array_index
+                new_key = collection.keyframe.add()
 
-        new_key.fcurve_frame = int(item[0].co[0] - origin_frame)
-        new_key.fcurve_value = item[0].co[1]
+                if parent_action is not None:
+                    new_key.parent_name = parent_action.name
+                new_key.parent_type = fc.id_data.id_root
 
-        #new_key.fcurve_additive_value = 
+                new_key.action_name = fc.id_data.name
+
+                new_key.fcurve_data_path = fc.data_path
+                new_key.fcurve_array_index = fc.array_index
+
+                new_key.fcurve_frame = kf.co[0]
+                new_key.fcurve_value = kf.co[1]
+                new_key.fcurve_additive_value = kf.co[1] - init_value
+
+    
+    # set relative frames
+    origin_frame = min(frames)
+    
+    for kf in collection.keyframe:
+        kf.fcurve_frame = kf.fcurve_frame - origin_frame
           
 
 class PUPT_OT_Create_Automation(bpy.types.Operator):
