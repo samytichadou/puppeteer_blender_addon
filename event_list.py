@@ -1,4 +1,4 @@
-unused_event = {
+unused_event = [
 
     "LEFTMOUSE",
     "MIDDLEMOUSE",
@@ -32,9 +32,9 @@ unused_event = {
     "TIMER_REPORT",
     "TIMERREGION",
     
-    }
+    ]
 
-used_event = {
+used_event = [
     
     "A",
     "B",
@@ -85,7 +85,6 @@ used_event = {
     "APP",
     "GRLESS",
 
-    "ESC",
     "TAB",
 
     "RET",
@@ -213,4 +212,10 @@ used_event = {
     "ACTIONZONE_REGION",
     "ACTIONZONE_FULLSCREEN",
 
-}
+    ]
+
+shortcut_event = [
+
+    "ESC",
+
+    ]

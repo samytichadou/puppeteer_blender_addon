@@ -1,13 +1,28 @@
 import bpy
 
 
+from . import event_list
+
+
+# key assignment callback
+def key_assignment_callback(scene, context):
+
+    items = []
+
+    #for e in sorted(event_list.used_event, key = str):
+    for e in event_list.used_event:
+         items.append((e, e, ""))
+
+    return items
+
+
 class PUPT_PR_automation_keyframe(bpy.types.PropertyGroup) :
     '''name : StringProperty() '''
 
     parent_name : bpy.props.StringProperty(name = "Parent Name")
     parent_type = bpy.props.EnumProperty(
         name = "Parent Type",
-        items=(
+        items = (
             ('OBJECT', "Object", ""),
             ('MATERIAL', "Material", ""),
             ('MATERIAL_NTREE', "Material NTree", ""),
@@ -30,7 +45,10 @@ class PUPT_PR_automation_keyframe(bpy.types.PropertyGroup) :
 class PUPT_PR_automation(bpy.types.PropertyGroup) :
     '''name : StringProperty() '''
 
-    key_assignment : bpy.props.StringProperty(name = "Key")
+    key_assignment : bpy.props.EnumProperty(
+        name = "Key",
+        items = key_assignment_callback,
+        )
 
     keyframe : bpy.props.CollectionProperty(
         name = "Keyframes",
