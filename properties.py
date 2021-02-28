@@ -20,7 +20,7 @@ class PUPT_PR_automation_keyframe(bpy.types.PropertyGroup) :
     '''name : StringProperty() '''
 
     parent_name : bpy.props.StringProperty(name = "Parent Name")
-    parent_type = bpy.props.EnumProperty(
+    parent_type : bpy.props.EnumProperty(
         name = "Parent Type",
         items = (
             ('OBJECT', "Object", ""),

@@ -112,8 +112,8 @@ class PUPT_PT_viewport_keyframes_subpanel(bpy.types.Panel):
             col1.label(text = "Parent :")
             col2.label(text = a_kf.parent_name)
 
-            # col1.label(text = "Type :")
-            # col2.label(text = str(a_kf.parent_type))
+            col1.label(text = "Type :")
+            col2.label(text = a_kf.parent_type)
 
             col1.label(text = "Action :")
             col2.label(text = a_kf.action_name)

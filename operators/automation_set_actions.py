@@ -29,7 +29,7 @@ class PUPT_OT_Automation_Set_Actions(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO", "INTERNAL"}
     bl_description = "Puppeteer automation set actions"
 
-    action = bpy.props.EnumProperty(
+    action : bpy.props.EnumProperty(
         items=(
             ('UP', "Up", ""),
             ('DOWN', "Down", ""),
