@@ -26,8 +26,6 @@ class PUPT_PR_automation_keyframe(bpy.types.PropertyGroup) :
     fcurve_value : bpy.props.FloatProperty(name = "Fcurve Value")
     fcurve_additive_value : bpy.props.FloatProperty(name = "Fcurve Additive Value")
 
-    show_details : bpy.props.BoolProperty(name = "Show Details")
-
 
 class PUPT_PR_automation(bpy.types.PropertyGroup) :
     '''name : StringProperty() '''
@@ -39,7 +37,7 @@ class PUPT_PR_automation(bpy.types.PropertyGroup) :
         type = PUPT_PR_automation_keyframe,
         )
 
-    show_keyframes : bpy.props.BoolProperty(name = "Show Keyframes")
+    keyframe_index : bpy.props.IntProperty(name = "Keyframe Index")
 
 
 class PUPT_PR_automation_set(bpy.types.PropertyGroup) :

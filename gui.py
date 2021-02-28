@@ -1,7 +1,23 @@
 import bpy
 
 
-# panel
+
+def return_active_set_automation(context):
+
+    active_set = active_automation = None
+
+    props = context.scene.pupt_properties
+
+    if props.automation_set_index in range(0, len(props.automation_set)):
+        active_set = props.automation_set[props.automation_set_index]
+        if active_set.automation_index in range(0, len(active_set.automation)):
+            active_automation = active_set.automation[active_set.automation_index]
+            
+    return active_set, active_automation
+
+
+
+# main panel
 class PUPT_PT_viewport_panel(bpy.types.Panel):
     bl_label = "Puppeteer"
     bl_space_type = "VIEW_3D"
@@ -56,44 +72,72 @@ class PUPT_PT_viewport_panel(bpy.types.Panel):
 
                 layout.prop(active_automation, "key_assignment")
 
-                # keyframes
-                if active_automation.show_keyframes:
-                    show_kf_icon = "DISCLOSURE_TRI_DOWN"
-                else:
-                    show_kf_icon = "DISCLOSURE_TRI_RIGHT"
-                row = layout.row(align=True)
-                row.prop(active_automation, "show_keyframes", text = "", icon = show_kf_icon, emboss = False)
-                row.label(text = str(len(active_automation.keyframe)) + " keyframes")
-                
-                if active_automation.show_keyframes:
 
-                    for kf in active_automation.keyframe:
+# keyframe subpanel
+class PUPT_PT_viewport_keyframes_subpanel(bpy.types.Panel):
+    bl_label = ""
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_parent_id = "PUPT_PT_viewport_panel"
+    bl_options = {'DEFAULT_CLOSED'}
+ 
+    @classmethod
+    def poll(cls, context):
+        a_set, a_automation = return_active_set_automation(context)
+        if a_automation is not None:
+            if a_automation.keyframe:
+                return True
 
-                        if kf.show_details:
-                            show_kf_d_icon = "DISCLOSURE_TRI_DOWN"
-                        else:
-                            show_kf_d_icon = "DISCLOSURE_TRI_RIGHT"
-                        row = layout.row(align=True)
-                        row.prop(kf, "show_details", text = "", icon = show_kf_d_icon, emboss = False)
-                        row.label(text = kf.parent_name)
+    def draw_header(self, context):
+        a_set, a_automation = return_active_set_automation(context)
+        self.layout.label(text = "%i Keyframes" % len(a_automation.keyframe))
+ 
+    def draw(self, context):
 
-                        # keyframe details
-                        if kf.show_details:
-                            layout.label(text="details")
+        layout = self.layout
 
-                        # split = layout.split()
-                        # subcol1 = split.column(align=True)
-                        # subcol2 = split.column(align=True)
+        a_set, a_automation = return_active_set_automation(context)
 
-                        # subcol1.label(text = kf.fcurve_data_path)
-                        # subcol2.label(text = "Frame" + str(kf.fcurve_frame))
+        layout.template_list("PUPT_UL_keyframes", "", a_automation, "keyframe", a_automation, "keyframe_index", rows = 4)
 
+        # keyframe details
+        if a_automation.keyframe_index in range(0, len(a_automation.keyframe)):
+            a_kf = a_automation.keyframe[a_automation.keyframe_index]
+
+            split = layout.split()
+
+            col1 = split.column(align=True)
+            col2 = split.column(align=True)
+            
+            col1.label(text = "Parent :")
+            col2.label(text = a_kf.parent_name)
+
+            # col1.label(text = "Type :")
+            # col2.label(text = str(a_kf.parent_type))
+
+            col1.label(text = "Action :")
+            col2.label(text = a_kf.action_name)
+
+            col1.label(text = "FCurve :")
+            col2.label(text = a_kf.fcurve_data_path + "[%i]" % a_kf.fcurve_array_index)
+
+            col1.label(text = "Frame :")
+            col2.label(text = str(a_kf.fcurve_frame))
+
+            col1.label(text = "Value :")
+            col2.label(text = str(a_kf.fcurve_value))
+
+            col1.label(text = "Additive Value :")
+            col2.label(text = str(a_kf.fcurve_additive_value))
+        
 
 
 ### REGISTER ---
 
 def register():
     bpy.utils.register_class(PUPT_PT_viewport_panel)
+    bpy.utils.register_class(PUPT_PT_viewport_keyframes_subpanel)
 
 def unregister():
     bpy.utils.unregister_class(PUPT_PT_viewport_panel)
+    bpy.utils.unregister_class(PUPT_PT_viewport_keyframes_subpanel)

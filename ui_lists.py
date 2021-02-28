@@ -28,13 +28,27 @@ class PUPT_UL_automation(bpy.types.UIList):
             layout.prop(item, "name", text="", emboss=False)
             # layout.prop(item, "key_assignment", text="")
 
+# keyframes
+class PUPT_UL_keyframes(bpy.types.UIList): 
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+
+        if self.layout_type in {'DEFAULT', 'COMPACT'}: 
+            layout.label(text = item.parent_name)
+            
+        elif self.layout_type in {'GRID'}: 
+            layout.alignment = 'CENTER' 
+            layout.label(text = item.parent_name)
+
 
 ### REGISTER ---
 
 def register():
     bpy.utils.register_class(PUPT_UL_automation_set)
     bpy.utils.register_class(PUPT_UL_automation)
+    bpy.utils.register_class(PUPT_UL_keyframes)
 
 def unregister():
     bpy.utils.unregister_class(PUPT_UL_automation_set)
     bpy.utils.unregister_class(PUPT_UL_automation)
+    bpy.utils.unregister_class(PUPT_UL_keyframes)
