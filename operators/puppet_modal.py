@@ -52,8 +52,9 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        a_set, a_automation = return_active_set_automation(context)
-        return a_set is not None
+        if context.space_data.type == "VIEW_3D":
+            a_set, a_automation = return_active_set_automation(context)
+            return a_set is not None 
 
 
     def modal(self, context, event):
