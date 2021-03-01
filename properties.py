@@ -102,8 +102,6 @@ class PUPT_PR_properties(bpy.types.PropertyGroup) :
         default = "PARENT",
         )
 
-    show_help : bpy.props.BoolProperty()
-
     bypass_update_tag : bpy.props.BoolProperty()
 
 ### REGISTER ---

@@ -39,7 +39,7 @@ def draw_puppet_helper_callback_px(self, context):
     blf.position(font_id, 15, l_pos, 0)
     blf.draw(font_id, "H - Toggle Help")
 
-    if props.show_help:
+    if self.show_help:
         help_size = size - 3
         help_line_offset = int(13 * size_coef)
 
@@ -90,6 +90,7 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
     bl_options = {"UNDO"} #, "INTERNAL"}
 
     _modifier_shift = False
+    show_help : bpy.props.BoolProperty()
 
 
     @classmethod
@@ -127,7 +128,7 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
             # H
             elif event.type == "H":
                 print("H " + event.value)
-                context.scene.pupt_properties.show_help = not context.scene.pupt_properties.show_help
+                self.show_help = not self.show_help
 
         # action
         elif event.type in event_list.used_event and event.value == "PRESS":
