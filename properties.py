@@ -2,18 +2,38 @@ import bpy
 
 
 from . import event_list
+from .gui import return_active_set_automation
 
 
 # key assignment callback
 def key_assignment_callback(scene, context):
 
-    items = []
+    items = [
+        ('NONE', "NONE", ""),
+    ]
 
-    #for e in sorted(event_list.used_event, key = str):
     for e in event_list.used_event:
-         items.append((e, e, ""))
+        items.append((e, e, ""))
 
     return items
+
+
+# avoid dupe key assignment
+def key_assignment_update(self, context):
+
+    props = context.scene.pupt_properties
+    if props.bypass_update_tag:
+        return
+
+    a_set, a_automation = return_active_set_automation(context)
+
+    for a in a_set.automation:
+        if a != self:
+            if a.key_assignment == self.key_assignment:
+                props.bypass_update_tag = True
+                self.key_assignment = "NONE"
+                props.bypass_update_tag = False
+                break
 
 
 class PUPT_PR_automation_keyframe(bpy.types.PropertyGroup) :
@@ -48,6 +68,7 @@ class PUPT_PR_automation(bpy.types.PropertyGroup) :
     key_assignment : bpy.props.EnumProperty(
         name = "Key",
         items = key_assignment_callback,
+        update = key_assignment_update,
         )
 
     keyframe : bpy.props.CollectionProperty(
@@ -71,6 +92,7 @@ class PUPT_PR_properties(bpy.types.PropertyGroup) :
     automation_set : bpy.props.CollectionProperty(type = PUPT_PR_automation_set, name="Automation Set")
     automation_set_index : bpy.props.IntProperty(name = "Automation Set Index")
 
+    bypass_update_tag : bpy.props.BoolProperty()
 
 ### REGISTER ---
 

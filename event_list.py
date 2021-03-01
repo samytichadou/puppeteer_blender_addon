@@ -86,9 +86,7 @@ used_event = [
     "GRLESS",
 
     "TAB",
-
     "RET",
-    "SPACE",
     "LINE_FEED",
     "BACK_SPACE",
     "DEL",
@@ -217,5 +215,6 @@ used_event = [
 shortcut_event = [
 
     "ESC",
+    "SPACE",
 
     ]
