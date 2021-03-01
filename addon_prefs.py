@@ -18,7 +18,7 @@ class PUPT_PF_Addon_Prefs(bpy.types.AddonPreferences):
     ui_text_size : bpy.props.IntProperty(
             name = "UI Text Size",
             default = 16,
-            min = 2,
+            min = 6,
             max = 99,
             )
 

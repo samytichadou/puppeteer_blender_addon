@@ -15,13 +15,53 @@ def draw_puppet_helper_callback_px(self, context):
     col = prefs.ui_text_color
     size = prefs.ui_text_size
 
+    props = context.scene.pupt_properties
+    paste_mode = props.paste_mode
     a_set, a_automation = return_active_set_automation(context)
+
+    size_coef = size/14
+
+    line_offset = int(15 * size_coef)
 
     # draw some text
     blf.color(0, *col)
-    blf.position(font_id, 15, 30, 0)
     blf.size(font_id, size, 72)
+
+    l_pos = 15
+    blf.position(font_id, 15, l_pos, 0)
     blf.draw(font_id, "Puppet Set : " + a_set.name)
+
+    l_pos += line_offset
+    blf.position(font_id, 15, l_pos, 0)
+    blf.draw(font_id, "Paste Mode : " + paste_mode)
+
+    l_pos += line_offset
+    blf.position(font_id, 15, l_pos, 0)
+    blf.draw(font_id, "H - Toggle Help")
+
+    if props.show_help:
+        help_size = size - 3
+        help_line_offset = int(13 * size_coef)
+
+        blf.size(font_id, help_size, 72)
+
+        l_pos += line_offset + 5
+        blf.position(font_id, 15, l_pos, 0)
+        blf.draw(font_id, "Esc/Enter - Quit")
+
+        l_pos += help_line_offset
+        blf.position(font_id, 15, l_pos, 0)
+        blf.draw(font_id, "Up Arrow - Change Paste Mode")
+
+        l_pos += help_line_offset
+        blf.position(font_id, 15, l_pos, 0)
+        blf.draw(font_id, "Down Arrow - Change Automation Set")
+
+        for a in a_set.automation:
+            if a.key_assignment != "NONE":
+                l_pos += help_line_offset
+                blf.position(font_id, 15, l_pos, 0)
+                blf.draw(font_id, "%s - %s" % (a.key_assignment, a.name))
 
 
 def change_active_set(context, up_dwn):
@@ -61,27 +101,33 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
         context.area.tag_redraw()
         
         # special shortcuts
-        if event.type in event_list.shortcut_event:
+        if event.type in event_list.shortcut_event and event.value == "PRESS":
             # ESC
             if event.type == 'ESC':
                 print("finished " + event.value)
                 self.finish(context)
                 return {'FINISHED'}
             # SPACE
-            elif event.type == 'SPACE' and event.value == "PRESS":
+            elif event.type == 'SPACE':
                 print("space " + event.value)
                 if not context.screen.is_animation_playing:
                     bpy.ops.screen.animation_play()
                 else:
                     bpy.ops.screen.animation_cancel(restore_frame = False)
             # DWN ARROW
-            elif event.type == "DOWN_ARROW" and event.value == "PRESS":
+            elif event.type == "DOWN_ARROW":
                 print("down " + event.value)
                 change_active_set(context, "dwn")
             # UP ARROW
-            elif event.type == "UP_ARROW" and event.value == "PRESS":
+            elif event.type == "UP_ARROW":
                 print("up " + event.value)
                 change_active_set(context, "up")
+            # H
+            elif event.type == "H":
+                print("H " + event.value)
+                context.scene.pupt_properties.show_help = not context.scene.pupt_properties.show_help
+
+
 
         # action
         elif event.type in event_list.used_event and event.value == "PRESS":

@@ -92,6 +92,18 @@ class PUPT_PR_properties(bpy.types.PropertyGroup) :
     automation_set : bpy.props.CollectionProperty(type = PUPT_PR_automation_set, name="Automation Set")
     automation_set_index : bpy.props.IntProperty(name = "Automation Set Index")
 
+    paste_mode : bpy.props.EnumProperty(
+        name = "Paste Mode",
+        items = (
+            ('PARENT', "Parent", "Paste keyframes to original parent only"),
+            ('ACTION', "Action", "Paste keyframes to original action only"),
+            ('PARENT_ACTION', "Parent and Action", "Paste keyframes to original parent and original action only"),
+            ),
+        default = "PARENT",
+        )
+
+    show_help : bpy.props.BoolProperty()
+
     bypass_update_tag : bpy.props.BoolProperty()
 
 ### REGISTER ---

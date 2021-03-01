@@ -35,6 +35,7 @@ class PUPT_PT_viewport_panel(bpy.types.Panel):
         layout = self.layout
 
         layout.operator("pupt.puppet_modal")
+        layout.prop(props, "paste_mode")
 
         # sets
         layout.label(text = "Automation Set")

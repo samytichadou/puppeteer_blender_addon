@@ -33,7 +33,6 @@ used_event = [
     "E",
     "F",
     "G",
-    "H",
     "I",
     "J",
     "K",
@@ -202,7 +201,9 @@ shortcut_event = [
     "SPACE",
 
     "DOWN_ARROW",
-    "UP_ARROW", 
+    "UP_ARROW",
+
+    "H",
 
     ]
 
