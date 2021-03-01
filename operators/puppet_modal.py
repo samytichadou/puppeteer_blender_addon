@@ -57,6 +57,8 @@ def draw_puppet_helper_callback_px(self, context):
         blf.position(font_id, 15, l_pos, 0)
         blf.draw(font_id, "Down Arrow - Change Automation Set")
 
+        l_pos += 5
+
         for a in a_set.automation:
             if a.key_assignment != "NONE":
                 l_pos += help_line_offset
@@ -126,8 +128,6 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
             elif event.type == "H":
                 print("H " + event.value)
                 context.scene.pupt_properties.show_help = not context.scene.pupt_properties.show_help
-
-
 
         # action
         elif event.type in event_list.used_event and event.value == "PRESS":
