@@ -162,7 +162,6 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
             return {'PASS_THROUGH'}
 
         return {'RUNNING_MODAL'}
-        #return {'PASS_THROUGH'}
 
 
     def invoke(self, context, event):
