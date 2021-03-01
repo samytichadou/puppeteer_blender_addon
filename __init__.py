@@ -47,6 +47,7 @@ from .operators import (
     automation_set_actions,
     automation_actions,
     create_automation,
+    puppet_modal,
 )
 
 
@@ -64,6 +65,7 @@ def register():
     automation_set_actions.register()
     automation_actions.register()
     create_automation.register()
+    puppet_modal.register()
 
 def unregister():
 
@@ -75,3 +77,4 @@ def unregister():
     automation_set_actions.unregister()
     automation_actions.unregister()
     create_automation.unregister()
+    puppet_modal.unregister()

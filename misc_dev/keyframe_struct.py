@@ -37,3 +37,16 @@ context.selected_visible_fcurves
         -> fcurve array_index
         -> fcurve co
     -> 
+
+
+# modal shortcut
+space = play
+shift = Additive
+
+# modal infos
+active keying set
+show help
+
+if help:
+    special shortcuts
+    automations

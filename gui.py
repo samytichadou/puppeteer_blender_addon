@@ -32,7 +32,9 @@ class PUPT_PT_viewport_panel(bpy.types.Panel):
 
         props = context.scene.pupt_properties
 
-        layout = self.layout 
+        layout = self.layout
+
+        layout.operator("pupt.puppet_modal")
 
         # sets
         layout.label(text = "Automation Set")

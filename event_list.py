@@ -1,7 +1,6 @@
 unused_event = [
 
     "LEFTMOUSE",
-    "MIDDLEMOUSE",
     "RIGHTMOUSE",
     "BUTTON4MOUSE",
     "BUTTON5MOUSE",
@@ -9,16 +8,7 @@ unused_event = [
     "BUTTON7MOUSE",
     "PEN",
     "ERASER",
-    "MOUSEMOVE",
-    "INBETWEEN_MOUSEMOVE",
-    "TRACKPADPAN",
-    "TRACKPADZOOM",
-    "MOUSEROTATE" ,
-    "MOUSESMARTZOOM",
-    "WHEELUPMOUSE",
-    "WHEELDOWNMOUSE",
-    "WHEELINMOUSE",
-    "WHEELOUTMOUSE",
+    
     "EVT_TWEAK_L",
     "EVT_TWEAK_M",
     "EVT_TWEAK_R",
@@ -76,10 +66,8 @@ used_event = [
 
     "LEFT_CTRL",
     "LEFT_ALT",
-    "LEFT_SHIFT",
     "RIGHT_ALT",
     "RIGHT_CTRL",
-    "RIGHT_SHIFT",
 
     "OSKEY",
     "APP",
@@ -104,10 +92,6 @@ used_event = [
     "EQUAL",
     "LEFT_BRACKET",
     "RIGHT_BRACKET",
-    "LEFT_ARROW",
-    "DOWN_ARROW",
-    "RIGHT_ARROW",
-    "UP_ARROW",
 
     "NUMPAD_2",
     "NUMPAD_4",
@@ -216,5 +200,34 @@ shortcut_event = [
 
     "ESC",
     "SPACE",
+
+    ]
+
+modifier_event = [
+
+    "LEFT_SHIFT",
+    "RIGHT_SHIFT",
+    
+    ]
+
+passthrough_event = [
+
+    "MOUSEMOVE",
+    "INBETWEEN_MOUSEMOVE",
+    "TRACKPADPAN",
+    "TRACKPADZOOM",
+    "MOUSEROTATE" ,
+    "MOUSESMARTZOOM",
+    "WHEELUPMOUSE",
+    "WHEELDOWNMOUSE",
+    "WHEELINMOUSE",
+    "WHEELOUTMOUSE",
+
+    "MIDDLEMOUSE", 
+
+    "LEFT_ARROW",
+    "DOWN_ARROW",
+    "RIGHT_ARROW",
+    "UP_ARROW", 
 
     ]

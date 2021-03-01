@@ -6,8 +6,29 @@ addon_name = os.path.basename(os.path.dirname(__file__))
 class PUPT_PF_Addon_Prefs(bpy.types.AddonPreferences):
     bl_idname = addon_name
 
+    ui_text_color : bpy.props.FloatVectorProperty(
+            name = "UI Text Color", 
+            size = 4,
+            min = 0.0,
+            max = 1.0,
+            default = [1, 1, 1, 1],
+            subtype = 'COLOR'
+            )
+
+    ui_text_size : bpy.props.IntProperty(
+            name = "UI Text Size",
+            default = 16,
+            min = 2,
+            max = 99,
+            )
+
     def draw(self, context):
         layout = self.layout
+
+        row = layout.row(align = True)
+        row.label(text = "UI Text")
+        row.prop(self, "ui_text_color", text = "")
+        row.prop(self, "ui_text_size", text = "Size")
  
 
 # get addon preferences
