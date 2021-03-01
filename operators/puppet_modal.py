@@ -21,7 +21,7 @@ def draw_puppet_helper_callback_px(self, context):
 
     size_coef = size/14
 
-    line_offset = int(15 * size_coef)
+    line_offset = int(16 * size_coef)
 
     # draw some text
     blf.color(0, *col)
@@ -37,7 +37,7 @@ def draw_puppet_helper_callback_px(self, context):
 
     l_pos += line_offset
     blf.position(font_id, 15, l_pos, 0)
-    blf.draw(font_id, "H - Toggle Help")
+    blf.draw(font_id, "H - Help")
 
     if self.show_help:
         help_size = size - 3
@@ -66,22 +66,33 @@ def draw_puppet_helper_callback_px(self, context):
                 blf.draw(font_id, "%s - %s" % (a.key_assignment, a.name))
 
 
-def change_active_set(context, up_dwn):
+def change_active_set(context):
 
     props = context.scene.pupt_properties
     idx = props.automation_set_index
     
-    if up_dwn == "up":
-        if idx > 0:
-            props.automation_set_index -= 1
-        elif idx == 0:
-            props.automation_set_index = len(props.automation_set) -1
-    elif up_dwn == "dwn":
-        if idx < len(props.automation_set) - 1:
-            props.automation_set_index += 1
-        elif idx == len(props.automation_set) - 1:
-            props.automation_set_index = 0
+    if idx < len(props.automation_set) - 1:
+        props.automation_set_index += 1
+    elif idx == len(props.automation_set) - 1:
+        props.automation_set_index = 0
 
+
+def change_paste_mode(context):
+    
+    props = context.scene.pupt_properties
+
+    # init prop if needed
+    try:
+        paste_mode = props["paste_mode"]
+    except KeyError:
+        props.paste_mode = props.paste_mode
+        paste_mode = props["paste_mode"]
+
+    if paste_mode < 2:
+        props["paste_mode"] += 1
+    else:
+        props["paste_mode"] = 0
+    
 
 class PUPT_OT_Puppet_Modal(bpy.types.Operator):
     """Draw a line with the mouse"""
@@ -120,11 +131,11 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
             # DWN ARROW
             elif event.type == "DOWN_ARROW":
                 print("down " + event.value)
-                change_active_set(context, "dwn")
+                change_active_set(context)
             # UP ARROW
             elif event.type == "UP_ARROW":
                 print("up " + event.value)
-                change_active_set(context, "up")
+                change_paste_mode(context)
             # H
             elif event.type == "H":
                 print("H " + event.value)
