@@ -94,6 +94,29 @@ def change_paste_mode(context):
         props["paste_mode"] = 0
     
 
+def create_keyframe_from_parent(keyframe, current_frame, additive):
+
+    if not keyframe.parent_name:
+        return
+
+    if keyframe.parent_type == "OBJECT":
+        parent = bpy.data.objects[keyframe.parent_name]
+    elif keyframe.parent_type == "MATERIAL":
+        parent = bpy.data.materials[keyframe.parent_name]
+    elif keyframe.parent_type == "WORLD":
+        parent = bpy.data.worlds[keyframe.parent_name]
+
+    # set ntree kframes
+
+    parent.keyframe_insert(
+        keyframe.fcurve_data_path,
+        index = keyframe.fcurve_array_index,
+        frame = current_frame + keyframe.fcurve_frame,
+        )
+
+    # set value for the keyframes additive and normal
+
+
 class PUPT_OT_Puppet_Modal(bpy.types.Operator):
     """Draw a line with the mouse"""
     bl_idname = "pupt.puppet_modal"
@@ -101,14 +124,38 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
     bl_options = {"UNDO"} #, "INTERNAL"}
 
     _modifier_shift = False
-    show_help : bpy.props.BoolProperty()
+    _event = None
 
+    show_help : bpy.props.BoolProperty()
 
     @classmethod
     def poll(cls, context):
         if context.space_data.type == "VIEW_3D":
             a_set, a_automation = return_active_set_automation(context)
             return a_set is not None 
+
+
+    def execute(self, context):
+        props = context.scene.pupt_properties
+        a_set, a_automation = return_active_set_automation(context)
+        current_frame = context.scene.frame_current
+
+        automation = None
+
+        for a in a_set.automation:
+            if a.key_assignment == self._event:
+                automation = a
+                break
+
+        if automation is None:
+            return
+
+        for kf in automation.keyframe:
+            if props.paste_mode == "PARENT":
+                create_keyframe_from_parent(kf, current_frame, self._modifier_shift)
+
+        for area in context.screen.areas:
+            area.tag_redraw()
 
 
     def modal(self, context, event):
@@ -143,10 +190,10 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
 
         # action
         elif event.type in event_list.used_event and event.value == "PRESS":
-            if self._modifier_shift:
-                print("modifier shift")
             print(event.type)
             print("other " + event.value)
+            self._event = event.type
+            self.execute(context)
 
         # modifiers
         elif event.type in event_list.modifier_event:
