@@ -4,7 +4,7 @@ import bpy
 class PUPT_OT_Automation_Actions(bpy.types.Operator):
     bl_idname = "pupt.automation_actions"
     bl_label = "Automation actions"
-    bl_options = {"REGISTER", "UNDO", "INTERNAL"}
+    bl_options = {"UNDO", "INTERNAL"}
     bl_description = "Puppeteer automation actions"
 
     action : bpy.props.EnumProperty(

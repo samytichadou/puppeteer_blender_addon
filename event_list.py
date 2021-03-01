@@ -201,6 +201,9 @@ shortcut_event = [
     "ESC",
     "SPACE",
 
+    "DOWN_ARROW",
+    "UP_ARROW", 
+
     ]
 
 modifier_event = [
@@ -226,8 +229,6 @@ passthrough_event = [
     "MIDDLEMOUSE", 
 
     "LEFT_ARROW",
-    "DOWN_ARROW",
     "RIGHT_ARROW",
-    "UP_ARROW", 
 
     ]

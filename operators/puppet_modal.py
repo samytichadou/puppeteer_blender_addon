@@ -7,7 +7,8 @@ from ..addon_prefs import get_addon_preferences
 from ..gui import return_active_set_automation
 
 
-def draw_callback_px(self, context):
+# draw puppet helper
+def draw_puppet_helper_callback_px(self, context):
     font_id = 0  # XXX, need to find out how best to get this.
     
     prefs = get_addon_preferences()
@@ -15,30 +16,44 @@ def draw_callback_px(self, context):
     size = prefs.ui_text_size
 
     a_set, a_automation = return_active_set_automation(context)
-    if a_set is None:
-        name = "None"
-    else:
-        name = a_set.name
 
     # draw some text
     blf.color(0, *col)
     blf.position(font_id, 15, 30, 0)
     blf.size(font_id, size, 72)
-    blf.draw(font_id, "Puppet Set : " + name)
+    blf.draw(font_id, "Puppet Set : " + a_set.name)
+
+
+def change_active_set(context, up_dwn):
+
+    props = context.scene.pupt_properties
+    idx = props.automation_set_index
+    
+    if up_dwn == "up":
+        if idx > 0:
+            props.automation_set_index -= 1
+        elif idx == 0:
+            props.automation_set_index = len(props.automation_set) -1
+    elif up_dwn == "dwn":
+        if idx < len(props.automation_set) - 1:
+            props.automation_set_index += 1
+        elif idx == len(props.automation_set) - 1:
+            props.automation_set_index = 0
 
 
 class PUPT_OT_Puppet_Modal(bpy.types.Operator):
     """Draw a line with the mouse"""
     bl_idname = "pupt.puppet_modal"
     bl_label = "Puppet"
+    bl_options = {"UNDO"} #, "INTERNAL"}
 
     _modifier_shift = False
 
 
     @classmethod
     def poll(cls, context):
-        if len(context.scene.pupt_properties.automation_set) != 0:
-            return True
+        a_set, a_automation = return_active_set_automation(context)
+        return a_set is not None
 
 
     def modal(self, context, event):
@@ -57,7 +72,15 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
                 if not context.screen.is_animation_playing:
                     bpy.ops.screen.animation_play()
                 else:
-                    bpy.ops.screen.animation_cancel(restore_frame = False)  
+                    bpy.ops.screen.animation_cancel(restore_frame = False)
+            # DWN ARROW
+            elif event.type == "DOWN_ARROW" and event.value == "PRESS":
+                print("down " + event.value)
+                change_active_set(context, "dwn")
+            # UP ARROW
+            elif event.type == "UP_ARROW" and event.value == "PRESS":
+                print("up " + event.value)
+                change_active_set(context, "up")
 
         # action
         elif event.type in event_list.used_event and event.value == "PRESS":
@@ -91,7 +114,7 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
 
         # draw
         args = (self, context)
-        self._handle = bpy.types.SpaceView3D.draw_handler_add(draw_callback_px, args, 'WINDOW', 'POST_PIXEL')
+        self._handle = bpy.types.SpaceView3D.draw_handler_add(draw_puppet_helper_callback_px, args, 'WINDOW', 'POST_PIXEL')
 
         # modal
         context.window_manager.modal_handler_add(self)

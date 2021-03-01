@@ -26,7 +26,7 @@ def add_item_to_collection(collection, base_name):
 class PUPT_OT_Automation_Set_Actions(bpy.types.Operator):
     bl_idname = "pupt.automation_set_actions"
     bl_label = "Set actions"
-    bl_options = {"REGISTER", "UNDO", "INTERNAL"}
+    bl_options = {"UNDO", "INTERNAL"}
     bl_description = "Puppeteer automation set actions"
 
     action : bpy.props.EnumProperty(
