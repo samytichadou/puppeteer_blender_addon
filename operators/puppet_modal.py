@@ -21,7 +21,7 @@ def draw_puppet_helper_callback_px(self, context):
 
     size_coef = size/14
 
-    line_offset = int(16 * size_coef)
+    line_offset = int(15 * size_coef)
 
     # draw some text
     blf.color(0, *col)
@@ -29,39 +29,28 @@ def draw_puppet_helper_callback_px(self, context):
 
     l_pos = 15
     blf.position(font_id, 15, l_pos, 0)
-    blf.draw(font_id, "Puppet Set : " + a_set.name)
+    blf.draw(font_id, "H - Help    Esc/Enter - Quit")
 
     l_pos += line_offset
     blf.position(font_id, 15, l_pos, 0)
-    blf.draw(font_id, "Paste Mode : " + paste_mode)
+    blf.draw(font_id, "Up Arrow - Paste Mode    Down Arrow - Automation Set")
+
+    l_pos += 5
 
     l_pos += line_offset
     blf.position(font_id, 15, l_pos, 0)
-    blf.draw(font_id, "H - Help")
+    blf.draw(font_id, "Paste Mode - %s" % paste_mode)
+
+    l_pos += line_offset
+    blf.position(font_id, 15, l_pos, 0)
+    blf.draw(font_id, "Puppet Set - %s" % a_set.name)
 
     if self.show_help:
-        help_size = size - 3
-        help_line_offset = int(13 * size_coef)
-
-        blf.size(font_id, help_size, 72)
-
-        l_pos += line_offset + 5
-        blf.position(font_id, 15, l_pos, 0)
-        blf.draw(font_id, "Esc/Enter - Quit")
-
-        l_pos += help_line_offset
-        blf.position(font_id, 15, l_pos, 0)
-        blf.draw(font_id, "Up Arrow - Change Paste Mode")
-
-        l_pos += help_line_offset
-        blf.position(font_id, 15, l_pos, 0)
-        blf.draw(font_id, "Down Arrow - Change Automation Set")
-
         l_pos += 5
 
         for a in a_set.automation:
             if a.key_assignment != "NONE":
-                l_pos += help_line_offset
+                l_pos += line_offset
                 blf.position(font_id, 15, l_pos, 0)
                 blf.draw(font_id, "%s - %s" % (a.key_assignment, a.name))
 
@@ -124,8 +113,7 @@ def create_keyframe_from_parent(keyframe, current_frame, additive):
             value[keyframe.fcurve_array_index] += keyframe.fcurve_additive_value
     setattr(parent, keyframe.fcurve_data_path, value)
 
-
-    # set ntree kframes
+    # set kframes
     if dim == 0:
         parent.keyframe_insert(
             keyframe.fcurve_data_path,
