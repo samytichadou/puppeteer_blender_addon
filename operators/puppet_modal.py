@@ -108,20 +108,36 @@ def create_keyframe_from_parent(keyframe, current_frame, additive):
 
     # set value for the keyframes additive and normal
     dim = parent.bl_rna.properties[keyframe.fcurve_data_path].array_length
-    if dim == 1:
-        parent.bl_rna.properties[keyframe.fcurve_data_path] = keyframe.fcurve_value
+    # normal
+    if not additive:
+        if dim == 0:
+            value = keyframe.fcurve_value
+        else:
+            value = getattr(parent, keyframe.fcurve_data_path)
+            value[keyframe.fcurve_array_index] = keyframe.fcurve_value
+    # additive
     else:
-        value = getattr(parent, keyframe.fcurve_data_path)
-        value[keyframe.fcurve_array_index] = keyframe.fcurve_value
-        setattr(parent, keyframe.fcurve_data_path, value)
+        if dim == 0:
+            value = getattr(parent, keyframe.fcurve_data_path) + keyframe.fcurve_additive_value
+        else:
+            value = getattr(parent, keyframe.fcurve_data_path)
+            value[keyframe.fcurve_array_index] += keyframe.fcurve_additive_value
+    setattr(parent, keyframe.fcurve_data_path, value)
+
 
     # set ntree kframes
-
-    parent.keyframe_insert(
-        keyframe.fcurve_data_path,
-        index = keyframe.fcurve_array_index,
-        frame = current_frame + keyframe.fcurve_frame,
-        )
+    if dim == 0:
+        parent.keyframe_insert(
+            keyframe.fcurve_data_path,
+            #index = keyframe.fcurve_array_index,
+            frame = current_frame + keyframe.fcurve_frame,
+            )
+    else:
+        parent.keyframe_insert(
+            keyframe.fcurve_data_path,
+            index = keyframe.fcurve_array_index,
+            frame = current_frame + keyframe.fcurve_frame,
+            )
 
 
 class PUPT_OT_Puppet_Modal(bpy.types.Operator):
