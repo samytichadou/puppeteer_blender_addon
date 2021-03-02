@@ -7,6 +7,12 @@ from ..addon_prefs import get_addon_preferences
 from ..gui import return_active_set_automation
 
 
+# draw text line from fontid
+def draw_text_line(font_id, right_pos, up_pos, text):
+    blf.position(font_id, right_pos, up_pos, 0)
+    blf.draw(font_id, text)
+
+
 # draw puppet helper
 def draw_puppet_helper_callback_px(self, context):
     font_id = 0  # XXX, need to find out how best to get this.
@@ -18,40 +24,50 @@ def draw_puppet_helper_callback_px(self, context):
     props = context.scene.pupt_properties
     paste_mode = props.paste_mode
     a_set, a_automation = return_active_set_automation(context)
+    
+    if self._modifier_shift:
+        keyframing_mode = "ADDITIVE"
+    else:
+        keyframing_mode = "NORMAL"
 
     size_coef = size/14
 
     line_offset = int(15 * size_coef)
 
-    # draw some text
+    # right margin
+    right_mg = 15
+
     blf.color(0, *col)
     blf.size(font_id, size, 72)
 
     l_pos = 15
-    blf.position(font_id, 15, l_pos, 0)
-    blf.draw(font_id, "H - Help    Esc/Enter - Quit")
-
-    l_pos += line_offset
-    blf.position(font_id, 15, l_pos, 0)
-    blf.draw(font_id, "Up Arrow - Paste Mode    Down Arrow - Automation Set")
-
-    l_pos += 5
-
-    l_pos += line_offset
-    blf.position(font_id, 15, l_pos, 0)
-    blf.draw(font_id, "Paste Mode - %s" % paste_mode)
-
-    l_pos += line_offset
-    blf.position(font_id, 15, l_pos, 0)
-    blf.draw(font_id, "Puppet Set - %s" % a_set.name)
+    draw_text_line(font_id, right_mg, l_pos, "Puppeteer    H - Toggle Help")
 
     if self.show_help:
+        
         l_pos += 5
+        l_pos += line_offset
+        draw_text_line(font_id, right_mg, l_pos, "Paste Mode - %s" % paste_mode)
+        l_pos += line_offset
+        draw_text_line(font_id, right_mg, l_pos, "Puppet Set - %s" % a_set.name)
+        l_pos += line_offset
+        draw_text_line(font_id, right_mg, l_pos, "Keyframing - %s" % keyframing_mode)
 
-        for a in a_set.automation:
+        l_pos += 5
+        l_pos += line_offset
+        draw_text_line(font_id, right_mg, l_pos, "Esc/Enter - Quit")
+        l_pos += line_offset
+        draw_text_line(font_id, right_mg, l_pos, "Shift - Additive Keyframing")
+        l_pos += line_offset
+        draw_text_line(font_id, right_mg, l_pos, "Down Arrow - Automation Set")
+        l_pos += line_offset
+        draw_text_line(font_id, right_mg, l_pos, "Up Arrow - Paste Mode")
+
+        l_pos += 5
+        for a in reversed(a_set.automation):
             if a.key_assignment != "NONE":
                 l_pos += line_offset
-                blf.position(font_id, 15, l_pos, 0)
+                blf.position(font_id, right_mg, l_pos, 0)
                 blf.draw(font_id, "%s - %s" % (a.key_assignment, a.name))
 
 
@@ -137,7 +153,7 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
     _modifier_shift = False
     _event = None
 
-    show_help : bpy.props.BoolProperty()
+    show_help : bpy.props.BoolProperty(default = True)
 
     @classmethod
     def poll(cls, context):

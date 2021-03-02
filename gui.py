@@ -134,7 +134,6 @@ class PUPT_PT_viewport_keyframes_subpanel(bpy.types.Panel):
             col2.label(text = str(a_kf.fcurve_additive_value))
         
 
-
 ### REGISTER ---
 
 def register():
