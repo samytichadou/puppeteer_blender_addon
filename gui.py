@@ -101,7 +101,7 @@ class PUPT_PT_viewport_keyframes_subpanel(bpy.types.Panel):
 
         a_set, a_automation = return_active_set_automation(context)
 
-        layout.template_list("PUPT_UL_keyframes", "", a_automation, "keyframe", a_automation, "keyframe_index", rows = 4)
+        layout.template_list("PUPT_UL_keyframes", "", a_automation, "keyframe", a_automation, "keyframe_index", rows = 2)
 
         # keyframe details
         if a_automation.keyframe_index in range(0, len(a_automation.keyframe)):
