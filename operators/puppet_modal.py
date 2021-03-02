@@ -106,6 +106,15 @@ def create_keyframe_from_parent(keyframe, current_frame, additive):
     elif keyframe.parent_type == "WORLD":
         parent = bpy.data.worlds[keyframe.parent_name]
 
+    # set value for the keyframes additive and normal
+    dim = parent.bl_rna.properties[keyframe.fcurve_data_path].array_length
+    if dim == 1:
+        parent.bl_rna.properties[keyframe.fcurve_data_path] = keyframe.fcurve_value
+    else:
+        value = getattr(parent, keyframe.fcurve_data_path)
+        value[keyframe.fcurve_array_index] = keyframe.fcurve_value
+        setattr(parent, keyframe.fcurve_data_path, value)
+
     # set ntree kframes
 
     parent.keyframe_insert(
@@ -113,8 +122,6 @@ def create_keyframe_from_parent(keyframe, current_frame, additive):
         index = keyframe.fcurve_array_index,
         frame = current_frame + keyframe.fcurve_frame,
         )
-
-    # set value for the keyframes additive and normal
 
 
 class PUPT_OT_Puppet_Modal(bpy.types.Operator):
