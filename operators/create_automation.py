@@ -2,6 +2,7 @@ import bpy
 
 
 from .automation_set_actions import add_item_to_collection
+from ..properties import key_assignment_callback
 
 
 # enum callback for automation set
@@ -130,10 +131,12 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
         name = "Automation Set",
         items = automation_set_callback,
         )
-
     new_automation_set_name : bpy.props.StringProperty(name = "Set name", default = "new_set")
-
     automation_name : bpy.props.StringProperty(name = "Automation name", default = "new_automation")
+    key_assignment : bpy.props.EnumProperty(
+        name = "Key Assignment",
+        items = key_assignment_callback,
+        )
 
     @classmethod
     def poll(cls, context):
@@ -150,12 +153,14 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
         return context.window_manager.invoke_props_dialog(self)
  
     def draw(self, context):
-        self.layout.prop(self, "automation_set")
+        layout = self.layout
+        layout.prop(self, "automation_set")
 
         if self.automation_set == "CREATE_NEW":
-            self.layout.prop(self, "new_automation_set_name")
+            layout.prop(self, "new_automation_set_name")
 
-        self.layout.prop(self, "automation_name")
+        layout.prop(self, "automation_name")
+        layout.prop(self, "key_assignment")
         
     def execute(self, context):
 
@@ -181,6 +186,7 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
         add_keyframes_to_collection(context, new_automation)
         #add_keyframes_to_collection(keyframes, new_automation)
 
+        new_automation.key_assignment = self.key_assignment
 
         # refresh ui
         for area in context.screen.areas:
