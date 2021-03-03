@@ -245,10 +245,16 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
         elif event.type in event_list.modifier_event:
             # SHIFT modifier
             if event.type in {"LEFT_SHIFT", "RIGHT_SHIFT"}:
-                if event.value == "PRESS":
-                    self._modifier_shift = True
-                elif event.value == "RELEASE":
-                    self._modifier_shift = False
+                # toggle additive
+                if get_addon_preferences().hold_additive:
+                    # hold shift to additive
+                    if event.value == "PRESS":
+                        self._modifier_shift = True
+                    elif event.value == "RELEASE":
+                        self._modifier_shift = False
+                else:
+                    if event.value == "PRESS":
+                        self._modifier_shift = not self._modifier_shift
 
         # passtrough
         elif event.type in event_list.passthrough_event:
