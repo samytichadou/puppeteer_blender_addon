@@ -196,13 +196,13 @@ class PUPT_MT_dopesheet_automation_menu(bpy.types.Menu):
 def draw_dopesheet_key_menu(self, context):
     layout = self.layout
     layout.separator()
-    layout.menu("PUPT_MT_dopesheet_menu")
+    layout.menu("PUPT_MT_dopesheet_automation_menu")
 
 
 # timeline menu entry for creating automation
 def draw_timeline_menu(self, context):
     layout = self.layout
-    layout.menu("PUPT_MT_dopesheet_menu")
+    layout.menu("PUPT_MT_dopesheet_automation_menu")
         
 
 ### REGISTER ---
