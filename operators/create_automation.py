@@ -115,7 +115,7 @@ def add_keyframes_to_collection(context, collection):
 
     for fc in context.visible_fcurves:
 
-        fc_keyframes.clear()       
+        #fc_keyframes.clear()
         fc_keyframes = return_selected_keyframes(fc)
 
         # ignore fcurve if no selected keyframes
