@@ -35,10 +35,10 @@ class PUPT_PT_viewport_panel(bpy.types.Panel):
         layout = self.layout
 
         layout.operator("pupt.puppet_modal")
-        layout.prop(props, "paste_mode")
+        layout.prop(props, "paste_mode", text = "Paste")
 
         # sets
-        layout.label(text = "Automation Set")
+        layout.label(text = "Automation Sets")
 
         row = layout.row()
 
@@ -54,26 +54,54 @@ class PUPT_PT_viewport_panel(bpy.types.Panel):
         # automations
         if props.automation_set_index in range(0, len(props.automation_set)):
 
-            active_set = props.automation_set[props.automation_set_index]
+            if not props.automation_set[props.automation_set_index].automation:
 
-            layout.label(text = "Automations")
+                layout.label(text = "No Automations")
 
-            row = layout.row()
+            
 
-            row.template_list("PUPT_UL_automation", "", active_set, "automation", active_set, "automation_index", rows = 4)
 
-            col = row.column(align=True)
-            col.operator("pupt.automation_actions", icon='REMOVE', text="").action = 'REMOVE'
-            col.separator()
-            col.operator("pupt.automation_actions", icon='TRIA_UP', text="").action = 'UP'
-            col.operator("pupt.automation_actions", icon='TRIA_DOWN', text="").action = 'DOWN'
+# automation subpanel 
+class PUPT_PT_viewport_automations_subpanel(bpy.types.Panel):
+    bl_label = ""
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_parent_id = "PUPT_PT_viewport_panel"
 
-            # automation details
-            if active_set.automation_index in range(0, len(active_set.automation)):
+    @classmethod
+    def poll(cls, context):
+        a_set, a_automation = return_active_set_automation(context)
+        if a_set is not None:
+            if a_set.automation:
+                return True
 
-                active_automation = active_set.automation[active_set.automation_index]
+    def draw_header(self, context):
+        a_set, a_automation = return_active_set_automation(context)
+        self.layout.label(text = "%i Automations" % len(a_set.automation))
 
-                layout.prop(active_automation, "key_assignment")
+    def draw(self, context):
+
+        props = context.scene.pupt_properties
+        active_set = props.automation_set[props.automation_set_index]
+
+        layout = self.layout
+
+        row = layout.row()
+
+        row.template_list("PUPT_UL_automation", "", active_set, "automation", active_set, "automation_index", rows = 4)
+
+        col = row.column(align=True)
+        col.operator("pupt.automation_actions", icon='REMOVE', text="").action = 'REMOVE'
+        col.separator()
+        col.operator("pupt.automation_actions", icon='TRIA_UP', text="").action = 'UP'
+        col.operator("pupt.automation_actions", icon='TRIA_DOWN', text="").action = 'DOWN'
+
+        # automation details
+        if active_set.automation_index in range(0, len(active_set.automation)):
+
+            active_automation = active_set.automation[active_set.automation_index]
+
+            layout.prop(active_automation, "key_assignment")
 
 
 # keyframe subpanel
@@ -81,7 +109,7 @@ class PUPT_PT_viewport_keyframes_subpanel(bpy.types.Panel):
     bl_label = ""
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_parent_id = "PUPT_PT_viewport_panel"
+    bl_parent_id = "PUPT_PT_viewport_automations_subpanel"
     bl_options = {'DEFAULT_CLOSED'}
  
     @classmethod
@@ -156,10 +184,12 @@ def draw_dopesheet_key_menu(self, context):
 
 def register():
     bpy.utils.register_class(PUPT_PT_viewport_panel)
+    bpy.utils.register_class(PUPT_PT_viewport_automations_subpanel)
     bpy.utils.register_class(PUPT_PT_viewport_keyframes_subpanel)
     bpy.types.DOPESHEET_MT_key.append(draw_dopesheet_key_menu)
 
 def unregister():
     bpy.utils.unregister_class(PUPT_PT_viewport_panel)
+    bpy.utils.unregister_class(PUPT_PT_viewport_automations_subpanel)
     bpy.utils.unregister_class(PUPT_PT_viewport_keyframes_subpanel)
     bpy.types.DOPESHEET_MT_key.remove(draw_dopesheet_key_menu)
