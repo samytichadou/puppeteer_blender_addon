@@ -134,42 +134,40 @@ def create_keyframe_from_parent(keyframe, current_frame, additive):
     elif keyframe.parent_type == "WORLD":
         parent = bpy.data.worlds[keyframe.parent_name]
     # nodes
-    elif keyframe.parent_type == "MATERIAL_NTREE":
-        parent = bpy.data.materials[keyframe.parent_name].node_tree
-    elif keyframe.parent_type == "WORLD_NTREE":
-        parent = bpy.data.worlds[keyframe.parent_name].node_tree
+    elif keyframe.parent_type in {"MATERIAL_NTREE", "WORLD_NTREE"}:
+        if keyframe.parent_type == "MATERIAL_NTREE":
+            parent = bpy.data.materials[keyframe.parent_name].node_tree
+        elif keyframe.parent_type == "WORLD_NTREE":
+            parent = bpy.data.worlds[keyframe.parent_name].node_tree
+        if keyframe.socket_type == "INPUTS":
+            parent = parent.nodes[keyframe.node_name].inputs[keyframe.socket_index]
+        else:
+            parent = parent.nodes[keyframe.node_name].outputs[keyframe.socket_index]
     # pose
     elif keyframe.parent_type == "OBJECT_POSE":
-        parent = bpy.data.objects[keyframe.parent_name].pose
+        parent = bpy.data.objects[keyframe.parent_name].pose.bones[keyframe.bone_name]
 
     # set value for the keyframes additive and normal
-    if keyframe.parent_type in {"OBJECT", "MATERIAL", "WORLD"}:
+    dim = parent.bl_rna.properties[keyframe.fcurve_data_path].array_length
 
-        dim = parent.bl_rna.properties[keyframe.fcurve_data_path].array_length
+    if not additive:
+        value = set_properties_from_parent(parent, keyframe, dim)
+    else:
+        value = set_additive_properties_from_parent(parent, keyframe, dim)
+    setattr(parent, keyframe.fcurve_data_path, value)
 
-        if not additive:
-            value = set_properties_from_parent(parent, keyframe, dim)
-        else:
-            value = set_additive_properties_from_parent(parent, keyframe, dim)
-        setattr(parent, keyframe.fcurve_data_path, value)
-
-        # set kframes
-        if dim == 0:
-            parent.keyframe_insert(
-                keyframe.fcurve_data_path,
-                frame = current_frame + keyframe.fcurve_frame,
-                )
-        else:
-            parent.keyframe_insert(
-                keyframe.fcurve_data_path,
-                index = keyframe.fcurve_array_index,
-                frame = current_frame + keyframe.fcurve_frame,
-                )
-
-    # set nodes values
-    elif keyframe.parent_type in {"MATERIAL_NTREE", "WORLD_NTREE"}:
-
-        pass
+    # set kframes
+    if dim == 0:
+        parent.keyframe_insert(
+            keyframe.fcurve_data_path,
+            frame = current_frame + keyframe.fcurve_frame,
+            )
+    else:
+        parent.keyframe_insert(
+            keyframe.fcurve_data_path,
+            index = keyframe.fcurve_array_index,
+            frame = current_frame + keyframe.fcurve_frame,
+            )
 
 
 class PUPT_OT_Puppet_Modal(bpy.types.Operator):
