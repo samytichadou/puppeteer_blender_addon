@@ -50,6 +50,7 @@ from .operators import (
     create_automation,
     puppet_modal,
     check_new_version,
+    assign_key,
 )
 
 
@@ -70,6 +71,7 @@ def register():
     create_automation.register()
     puppet_modal.register()
     check_new_version.register()
+    assign_key.register()
 
 def unregister():
 
@@ -84,3 +86,4 @@ def unregister():
     create_automation.unregister()
     puppet_modal.unregister()
     check_new_version.unregister()
+    assign_key.unregister()

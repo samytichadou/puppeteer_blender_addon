@@ -111,7 +111,9 @@ class PUPT_PT_viewport_automations_subpanel(bpy.types.Panel):
 
             active_automation = active_set.automation[active_set.automation_index]
 
-            layout.prop(active_automation, "key_assignment")
+            row = layout.row(align=True)
+            row.operator("pupt.assign_key", text = "", icon = "EVENT_SPACEKEY")
+            row.prop(active_automation, "key_assignment", text = "")
 
 
 # keyframe subpanel
