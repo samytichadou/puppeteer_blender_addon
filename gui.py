@@ -16,7 +16,6 @@ def return_active_set_automation(context):
     return active_set, active_automation
 
 
-
 # main panel
 class PUPT_PT_viewport_panel(bpy.types.Panel):
     bl_label = "Puppeteer"
@@ -57,9 +56,7 @@ class PUPT_PT_viewport_panel(bpy.types.Panel):
             if not props.automation_set[props.automation_set_index].automation:
 
                 layout.label(text = "No Automations")
-
-            
-
+           
 
 # automation subpanel 
 class PUPT_PT_viewport_automations_subpanel(bpy.types.Panel):
