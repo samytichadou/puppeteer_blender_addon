@@ -43,7 +43,7 @@ class PUPT_PF_Addon_Prefs(bpy.types.AddonPreferences):
         row.prop(self, "ui_text_color", text = "")
         row.prop(self, "ui_text_size", text = "Size")
 
-        layout.prop(self, "hold_additive")
+        layout.prop(self, "hold_additive", text = "Hold Shift for Additive mode")
  
 
 # get addon preferences
