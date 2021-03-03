@@ -203,7 +203,9 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return True
+        for fc in context.visible_fcurves:
+            if return_selected_keyframes(fc):
+                return True
  
     def invoke(self, context, event):
         pupt_props = context.scene.pupt_properties
