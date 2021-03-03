@@ -1,7 +1,10 @@
 import bpy
 import os
 
+from .gui import draw_update_needed_warning
+
 addon_name = os.path.basename(os.path.dirname(__file__))
+
 
 class PUPT_PF_Addon_Prefs(bpy.types.AddonPreferences):
     bl_idname = addon_name
@@ -29,6 +32,9 @@ class PUPT_PF_Addon_Prefs(bpy.types.AddonPreferences):
 
     def draw(self, context):
         layout = self.layout
+
+        # update warning
+        draw_update_needed_warning(layout, context.scene.pupt_properties)
 
         row = layout.row(align = True)
         row.label(text = "UI Text")

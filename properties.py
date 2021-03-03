@@ -119,6 +119,12 @@ class PUPT_PR_properties(bpy.types.PropertyGroup) :
         )
 
     bypass_update_tag : bpy.props.BoolProperty()
+    
+    # update settings
+    update_needed : bpy.props.BoolProperty()
+    update_download_url : bpy.props.StringProperty()
+    update_message : bpy.props.StringProperty()
+
 
 ### REGISTER ---
 

@@ -16,6 +16,15 @@ def return_active_set_automation(context):
     return active_set, active_automation
 
 
+# draw update warning
+def draw_update_needed_warning(container, pupt_properties):
+    if pupt_properties.update_needed:
+        box = container.box()
+        box.operator("wm.url_open", text = "New Addon Version", icon = "URL").url = pupt_properties.update_download_url
+        if pupt_properties.update_message:
+            box.label(text = pupt_properties.update_message)
+
+
 # main panel
 class PUPT_PT_viewport_panel(bpy.types.Panel):
     bl_label = "Puppeteer"
@@ -33,6 +42,10 @@ class PUPT_PT_viewport_panel(bpy.types.Panel):
 
         layout = self.layout
 
+        # update warning
+        draw_update_needed_warning(layout, props)
+
+        # general
         layout.operator("pupt.puppet_modal")
         layout.prop(props, "paste_mode", text = "Paste")
 
