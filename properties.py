@@ -76,6 +76,30 @@ class PUPT_PR_automation_keyframe(bpy.types.PropertyGroup) :
     # pose specific
     bone_name : bpy.props.StringProperty(name = "Bone Name")
 
+    # handles
+    handle_left : bpy.props.FloatVectorProperty(
+        name = "Handle Left",
+        size = 2,
+        )
+    handle_right : bpy.props.FloatVectorProperty(
+        name = "Handle Right",
+        size = 2,
+        )
+    handle_type_items = (
+        ('AUTO_CLAMPED', "Auto Clamped", ""),
+        ('AUTO', "Automatic", ""),
+        ('VECTOR', "Vector", ""),
+        ('ALIGNED', "Aligned", ""),
+        ('FREE', "Free", ""),
+        )
+    handle_left_type : bpy.props.EnumProperty(
+        name = "Handle Left Type",
+        items = handle_type_items,
+        )
+    handle_right_type : bpy.props.EnumProperty(
+        name = "Handle Right Type",
+        items = handle_type_items,
+        )
 
 
 class PUPT_PR_automation(bpy.types.PropertyGroup) :

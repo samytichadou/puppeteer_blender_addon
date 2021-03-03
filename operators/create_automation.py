@@ -165,6 +165,11 @@ def add_keyframes_to_collection(context, collection):
             new_key.fcurve_value = kf.co[1]
             new_key.fcurve_additive_value = kf.co[1] - init_value
 
+            new_key.handle_left = kf.handle_left
+            new_key.handle_right = kf.handle_right
+            new_key.handle_left_type = kf.handle_left_type
+            new_key.handle_right_type = kf.handle_right_type
+
             if "_NTREE" in parent_type:
                 new_key.node_name = node_infos[0]
                 new_key.socket_type = node_infos[1].upper()
