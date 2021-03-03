@@ -99,23 +99,21 @@ def change_paste_mode(context):
         props["paste_mode"] = 0
 
 
-def set_properties_from_parent(parent, keyframe, dimension):
+def get_properties_value_for_keyframe(value, keyframe, dimension):
 
     if dimension == 0:
         value = keyframe.fcurve_value
     else:
-        value = getattr(parent, keyframe.fcurve_data_path)
         value[keyframe.fcurve_array_index] = keyframe.fcurve_value
     
     return value
 
 
-def set_additive_properties_from_parent(parent, keyframe, dimension):
+def get_additive_properties_value_for_keyframe(value, keyframe, dimension):
     
     if dimension == 0:
-        value = getattr(parent, keyframe.fcurve_data_path) + keyframe.fcurve_additive_value
+        value += keyframe.fcurve_additive_value
     else:
-        value = getattr(parent, keyframe.fcurve_data_path)
         value[keyframe.fcurve_array_index] += keyframe.fcurve_additive_value
 
     return value
@@ -149,11 +147,12 @@ def create_keyframe_from_parent(keyframe, current_frame, additive):
 
     # set value for the keyframes additive and normal
     dim = parent.bl_rna.properties[keyframe.fcurve_data_path].array_length
+    old_value = getattr(parent, keyframe.fcurve_data_path)
 
     if not additive:
-        value = set_properties_from_parent(parent, keyframe, dim)
+        value = get_properties_value_for_keyframe(old_value, keyframe, dim)
     else:
-        value = set_additive_properties_from_parent(parent, keyframe, dim)
+        value = get_additive_properties_value_for_keyframe(old_value, keyframe, dim)
     setattr(parent, keyframe.fcurve_data_path, value)
 
     # set kframes
@@ -168,6 +167,8 @@ def create_keyframe_from_parent(keyframe, current_frame, additive):
             index = keyframe.fcurve_array_index,
             frame = current_frame + keyframe.fcurve_frame,
             )
+
+    setattr(parent, keyframe.fcurve_data_path, old_value)
 
 
 class PUPT_OT_Puppet_Modal(bpy.types.Operator):
