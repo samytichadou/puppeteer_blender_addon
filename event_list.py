@@ -1,13 +1,4 @@
 unused_event = [
-
-    "LEFTMOUSE",
-    "RIGHTMOUSE",
-    "BUTTON4MOUSE",
-    "BUTTON5MOUSE",
-    "BUTTON6MOUSE",
-    "BUTTON7MOUSE",
-    "PEN",
-    "ERASER",
     
     "EVT_TWEAK_L",
     "EVT_TWEAK_M",
@@ -228,6 +219,15 @@ passthrough_event = [
     "WHEELOUTMOUSE",
 
     "MIDDLEMOUSE", 
+
+    "LEFTMOUSE",
+    "RIGHTMOUSE",
+    "BUTTON4MOUSE",
+    "BUTTON5MOUSE",
+    "BUTTON6MOUSE",
+    "BUTTON7MOUSE",
+    "PEN",
+    "ERASER",
 
     "LEFT_ARROW",
     "RIGHT_ARROW",
