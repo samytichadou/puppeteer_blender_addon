@@ -40,13 +40,18 @@ def get_init_keyframe(keyframe_list):
 
 
 # return action/parent list
-def return_parent_action(context, action):
+def return_parent_action(context, fcurve):
+
+    action = fcurve.id_data
 
     # objects
     for ob in context.scene.objects:
         if ob.animation_data:
             if action == ob.animation_data.action:
-                return ob, "OBJECT"
+                if "pose.bones" in fcurve.data_path:
+                    return ob, "OBJECT_POSE"
+                else:
+                    return ob, "OBJECT"
 
     # materials and nodetree
     for ma in bpy.data.materials:
@@ -74,6 +79,33 @@ def return_parent_action(context, action):
     return None, None
 
 
+# split nodes data path and format it
+def split_nodes_data_path(long_data_path):
+
+    node_name = long_data_path.split('nodes["')[1].split('"]')[0]
+
+    shorten = long_data_path.split('"].')[1]
+
+    socket = shorten.split('[')[0]
+    socket_index = shorten.split('[')[1].split(']')[0]
+
+    data_path = shorten.split('].')[1]
+
+    return node_name, socket, socket_index, data_path
+
+
+# split pose data path and format it 
+def split_pose_data_path(long_data_path):
+
+    shorten = long_data_path.split("pose.")[1]
+
+    bone_name = shorten.split('["')[1].split('"].')[0]
+
+    data_path = shorten.split('].')[1]
+
+    return bone_name, data_path
+
+
 # keyframe infos
 def add_keyframes_to_collection(context, collection):
 
@@ -93,7 +125,18 @@ def add_keyframes_to_collection(context, collection):
             init_value = init_keyframe.co[1]
 
             # get parent action
-            parent_action, parent_type = return_parent_action(context, fc.id_data)
+            parent_action, parent_type = return_parent_action(context, fc)
+
+            if "_NTREE" in parent_type:
+                node_infos = split_nodes_data_path(fc.data_path)
+                #[0]node_name, [1]socket, [2]socket_index, [3]data_path
+                data_path = node_infos[3]
+            elif "_POSE" in parent_type:
+                pose_infos = split_pose_data_path(fc.data_path)
+                #[0]bone_name, [1]data_path
+                data_path = pose_infos[1]
+            else:
+                data_path = fc.data_path
 
             for kf in fc_keyframes:
 
@@ -106,12 +149,20 @@ def add_keyframes_to_collection(context, collection):
 
                 new_key.action_name = fc.id_data.name
 
-                new_key.fcurve_data_path = fc.data_path
+                new_key.fcurve_data_path = data_path
                 new_key.fcurve_array_index = fc.array_index
 
                 new_key.fcurve_frame = kf.co[0]
                 new_key.fcurve_value = kf.co[1]
                 new_key.fcurve_additive_value = kf.co[1] - init_value
+
+                if "_NTREE" in parent_type:
+                    new_key.node_name = node_infos[0]
+                    new_key.socket_type = node_infos[1].upper()
+                    new_key.socket_index = int(node_infos[2])
+
+                elif "_POSE" in parent_type:
+                    new_key.bone_name = pose_infos[0]
 
     
     # set relative frames

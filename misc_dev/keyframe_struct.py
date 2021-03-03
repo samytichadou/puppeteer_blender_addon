@@ -50,3 +50,10 @@ show help
 if help:
     special shortcuts
     automations
+
+
+# nodes datapath
+nodes["nodename"].inputs[0].default_value[3]
+
+# pose datapath
+pose.bones["bonename"].location[0]

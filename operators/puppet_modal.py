@@ -97,51 +97,79 @@ def change_paste_mode(context):
         props["paste_mode"] += 1
     else:
         props["paste_mode"] = 0
+
+
+def set_properties_from_parent(parent, keyframe, dimension):
+
+    if dimension == 0:
+        value = keyframe.fcurve_value
+    else:
+        value = getattr(parent, keyframe.fcurve_data_path)
+        value[keyframe.fcurve_array_index] = keyframe.fcurve_value
     
+    return value
+
+
+def set_additive_properties_from_parent(parent, keyframe, dimension):
+    
+    if dimension == 0:
+        value = getattr(parent, keyframe.fcurve_data_path) + keyframe.fcurve_additive_value
+    else:
+        value = getattr(parent, keyframe.fcurve_data_path)
+        value[keyframe.fcurve_array_index] += keyframe.fcurve_additive_value
+
+    return value
+
 
 def create_keyframe_from_parent(keyframe, current_frame, additive):
 
     if not keyframe.parent_name:
         return
 
+    # get direct parent
     if keyframe.parent_type == "OBJECT":
         parent = bpy.data.objects[keyframe.parent_name]
     elif keyframe.parent_type == "MATERIAL":
         parent = bpy.data.materials[keyframe.parent_name]
     elif keyframe.parent_type == "WORLD":
         parent = bpy.data.worlds[keyframe.parent_name]
+    # nodes
+    elif keyframe.parent_type == "MATERIAL_NTREE":
+        parent = bpy.data.materials[keyframe.parent_name].node_tree
+    elif keyframe.parent_type == "WORLD_NTREE":
+        parent = bpy.data.worlds[keyframe.parent_name].node_tree
+    # pose
+    elif keyframe.parent_type == "OBJECT_POSE":
+        parent = bpy.data.objects[keyframe.parent_name].pose
 
     # set value for the keyframes additive and normal
-    dim = parent.bl_rna.properties[keyframe.fcurve_data_path].array_length
-    # normal
-    if not additive:
-        if dim == 0:
-            value = keyframe.fcurve_value
-        else:
-            value = getattr(parent, keyframe.fcurve_data_path)
-            value[keyframe.fcurve_array_index] = keyframe.fcurve_value
-    # additive
-    else:
-        if dim == 0:
-            value = getattr(parent, keyframe.fcurve_data_path) + keyframe.fcurve_additive_value
-        else:
-            value = getattr(parent, keyframe.fcurve_data_path)
-            value[keyframe.fcurve_array_index] += keyframe.fcurve_additive_value
-    setattr(parent, keyframe.fcurve_data_path, value)
+    if keyframe.parent_type in {"OBJECT", "MATERIAL", "WORLD"}:
 
-    # set kframes
-    if dim == 0:
-        parent.keyframe_insert(
-            keyframe.fcurve_data_path,
-            #index = keyframe.fcurve_array_index,
-            frame = current_frame + keyframe.fcurve_frame,
-            )
-    else:
-        parent.keyframe_insert(
-            keyframe.fcurve_data_path,
-            index = keyframe.fcurve_array_index,
-            frame = current_frame + keyframe.fcurve_frame,
-            )
+        dim = parent.bl_rna.properties[keyframe.fcurve_data_path].array_length
+
+        if not additive:
+            value = set_properties_from_parent(parent, keyframe, dim)
+        else:
+            value = set_additive_properties_from_parent(parent, keyframe, dim)
+        setattr(parent, keyframe.fcurve_data_path, value)
+
+        # set kframes
+        if dim == 0:
+            parent.keyframe_insert(
+                keyframe.fcurve_data_path,
+                frame = current_frame + keyframe.fcurve_frame,
+                )
+        else:
+            parent.keyframe_insert(
+                keyframe.fcurve_data_path,
+                index = keyframe.fcurve_array_index,
+                frame = current_frame + keyframe.fcurve_frame,
+                )
+
+    # set nodes values
+    elif keyframe.parent_type in {"MATERIAL_NTREE", "WORLD_NTREE"}:
+
+        pass
 
 
 class PUPT_OT_Puppet_Modal(bpy.types.Operator):
@@ -192,33 +220,26 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
         if event.type in event_list.shortcut_event and event.value == "PRESS":
             # ESC
             if event.type == 'ESC':
-                print("finished " + event.value)
                 self.finish(context)
                 return {'FINISHED'}
             # SPACE
             elif event.type == 'SPACE':
-                print("space " + event.value)
                 if not context.screen.is_animation_playing:
                     bpy.ops.screen.animation_play()
                 else:
                     bpy.ops.screen.animation_cancel(restore_frame = False)
             # DWN ARROW
             elif event.type == "DOWN_ARROW":
-                print("down " + event.value)
                 change_active_set(context)
             # UP ARROW
             elif event.type == "UP_ARROW":
-                print("up " + event.value)
                 change_paste_mode(context)
             # H
             elif event.type == "H":
-                print("H " + event.value)
                 self.show_help = not self.show_help
 
         # action
         elif event.type in event_list.used_event and event.value == "PRESS":
-            print(event.type)
-            print("other " + event.value)
             self._event = event.type
             self.execute(context)
 
@@ -254,7 +275,6 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
     def finish(self, context):
-        print("finish function")
         bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
 
 
