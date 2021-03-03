@@ -121,6 +121,17 @@ class PUPT_PT_viewport_keyframes_subpanel(bpy.types.Panel):
             col1.label(text = "Action :")
             col2.label(text = a_kf.action_name)
 
+            if "_NTREE" in a_kf.parent_type:
+                col1.label(text = "Node :")
+                col2.label(text = a_kf.node_name)
+
+                col1.label(text = "Socket :")
+                col2.label(text = a_kf.socket_type + "[%i]" % a_kf.socket_index)
+
+            elif "_POSE" in a_kf.parent_type:
+                col1.label(text = "Bone :")
+                col2.label(text = a_kf.bone_name)
+
             col1.label(text = "FCurve :")
             col2.label(text = a_kf.fcurve_data_path + "[%i]" % a_kf.fcurve_array_index)
 
