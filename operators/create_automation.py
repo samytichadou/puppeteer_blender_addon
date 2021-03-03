@@ -111,65 +111,77 @@ def add_keyframes_to_collection(context, collection):
 
     fc_keyframes = []
     frames = []
+    automation_check = False
 
     for fc in context.visible_fcurves:
 
         fc_keyframes.clear()       
         fc_keyframes = return_selected_keyframes(fc)
 
-        if fc_keyframes:
+        # ignore fcurve if no selected keyframes
+        if not fc_keyframes:
+            continue
 
-            #get initial frame/value
-            init_keyframe = get_init_keyframe(fc_keyframes)
-            frames.append(init_keyframe.co[0])
-            init_value = init_keyframe.co[1]
+        #get initial frame/value
+        init_keyframe = get_init_keyframe(fc_keyframes)
+        frames.append(init_keyframe.co[0])
+        init_value = init_keyframe.co[1]
 
-            # get parent action
-            parent_action, parent_type = return_parent_action(context, fc)
+        # get parent action
+        parent_action, parent_type = return_parent_action(context, fc)
+
+        # ignore fcurve if undetailed parent type (NodeGroups)
+        if parent_type is None:
+            continue
+
+        automation_check = True
+
+        if "_NTREE" in parent_type:
+            node_infos = split_nodes_data_path(fc.data_path)
+            #[0]node_name, [1]socket, [2]socket_index, [3]data_path
+            data_path = node_infos[3]
+        elif "_POSE" in parent_type:
+            pose_infos = split_pose_data_path(fc.data_path)
+            #[0]bone_name, [1]data_path
+            data_path = pose_infos[1]
+        else:
+            data_path = fc.data_path
+
+        for kf in fc_keyframes:
+
+            new_key = collection.keyframe.add()
+
+            if parent_action is not None:
+                new_key.parent_name = parent_action.name
+                new_key.parent_type = parent_type
+            new_key.parent_subtype = fc.id_data.id_root
+
+            new_key.action_name = fc.id_data.name
+
+            new_key.fcurve_data_path = data_path
+            new_key.fcurve_array_index = fc.array_index
+
+            new_key.fcurve_frame = kf.co[0]
+            new_key.fcurve_value = kf.co[1]
+            new_key.fcurve_additive_value = kf.co[1] - init_value
 
             if "_NTREE" in parent_type:
-                node_infos = split_nodes_data_path(fc.data_path)
-                #[0]node_name, [1]socket, [2]socket_index, [3]data_path
-                data_path = node_infos[3]
+                new_key.node_name = node_infos[0]
+                new_key.socket_type = node_infos[1].upper()
+                new_key.socket_index = int(node_infos[2])
+
             elif "_POSE" in parent_type:
-                pose_infos = split_pose_data_path(fc.data_path)
-                #[0]bone_name, [1]data_path
-                data_path = pose_infos[1]
-            else:
-                data_path = fc.data_path
-
-            for kf in fc_keyframes:
-
-                new_key = collection.keyframe.add()
-
-                if parent_action is not None:
-                    new_key.parent_name = parent_action.name
-                    new_key.parent_type = parent_type
-                new_key.parent_subtype = fc.id_data.id_root
-
-                new_key.action_name = fc.id_data.name
-
-                new_key.fcurve_data_path = data_path
-                new_key.fcurve_array_index = fc.array_index
-
-                new_key.fcurve_frame = kf.co[0]
-                new_key.fcurve_value = kf.co[1]
-                new_key.fcurve_additive_value = kf.co[1] - init_value
-
-                if "_NTREE" in parent_type:
-                    new_key.node_name = node_infos[0]
-                    new_key.socket_type = node_infos[1].upper()
-                    new_key.socket_index = int(node_infos[2])
-
-                elif "_POSE" in parent_type:
-                    new_key.bone_name = pose_infos[0]
+                new_key.bone_name = pose_infos[0]
 
     
     # set relative frames
-    origin_frame = min(frames)
-    
-    for kf in collection.keyframe:
-        kf.fcurve_frame = kf.fcurve_frame - origin_frame
+    if frames:
+        origin_frame = min(frames)
+        
+        for kf in collection.keyframe:
+            kf.fcurve_frame = kf.fcurve_frame - origin_frame
+
+    return automation_check
           
 
 class PUPT_OT_Create_Automation(bpy.types.Operator):
@@ -227,23 +239,27 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
             active_set = sets[pupt_props.automation_set_index]
 
         else:
-
             active_set = sets[self.automation_set]
 
         # create automation
         new_automation = add_item_to_collection(active_set.automation, self.automation_name)
 
         # get keyframes in collection
-        add_keyframes_to_collection(context, new_automation)
-        #add_keyframes_to_collection(keyframes, new_automation)
+        if add_keyframes_to_collection(context, new_automation):
 
-        new_automation.key_assignment = self.key_assignment
+            new_automation.key_assignment = self.key_assignment
+            active_set.automation_index = len(active_set.automation)-1
+            self.report({'INFO'}, "Automation created")
+
+        else:
+            # remove created automation
+            active_set.automation.remove(len(active_set.automation)-1)
+            self.report({'INFO'}, "No Valid Keyframes")
 
         # refresh ui
         for area in context.screen.areas:
             area.tag_redraw()
 
-        self.report({'INFO'}, "Automation created")
 
         return {'FINISHED'}
 
