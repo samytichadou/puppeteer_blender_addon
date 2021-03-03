@@ -98,7 +98,7 @@ class PUPT_PT_viewport_automations_subpanel(bpy.types.Panel):
 
         row = layout.row()
 
-        row.template_list("PUPT_UL_automation", "", active_set, "automation", active_set, "automation_index", rows = 4)
+        row.template_list("PUPT_UL_automation", "", active_set, "automation", active_set, "automation_index", rows = 3)
 
         col = row.column(align=True)
         col.operator("pupt.automation_actions", icon='REMOVE', text="").action = 'REMOVE'
@@ -183,11 +183,26 @@ class PUPT_PT_viewport_keyframes_subpanel(bpy.types.Panel):
             col2.label(text = str(a_kf.fcurve_additive_value))
 
 
+class PUPT_MT_dopesheet_automation_menu(bpy.types.Menu):
+    bl_label = "Puppeteer"
+    bl_idname = "PUPT_MT_dopesheet_automation_menu"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator("pupt.create_automation")
+
+
 # key menu entry for creating automation
 def draw_dopesheet_key_menu(self, context):
     layout = self.layout
     layout.separator()
-    layout.operator("pupt.create_automation")
+    layout.menu("PUPT_MT_dopesheet_menu")
+
+
+# timeline menu entry for creating automation
+def draw_timeline_menu(self, context):
+    layout = self.layout
+    layout.menu("PUPT_MT_dopesheet_menu")
         
 
 ### REGISTER ---
@@ -196,10 +211,18 @@ def register():
     bpy.utils.register_class(PUPT_PT_viewport_panel)
     bpy.utils.register_class(PUPT_PT_viewport_automations_subpanel)
     bpy.utils.register_class(PUPT_PT_viewport_keyframes_subpanel)
+    bpy.utils.register_class(PUPT_MT_dopesheet_automation_menu)
+
     bpy.types.DOPESHEET_MT_key.append(draw_dopesheet_key_menu)
+    bpy.types.GRAPH_MT_key.append(draw_dopesheet_key_menu)
+    bpy.types.TIME_MT_editor_menus.append(draw_timeline_menu)
 
 def unregister():
     bpy.utils.unregister_class(PUPT_PT_viewport_panel)
     bpy.utils.unregister_class(PUPT_PT_viewport_automations_subpanel)
     bpy.utils.unregister_class(PUPT_PT_viewport_keyframes_subpanel)
+    bpy.utils.unregister_class(PUPT_MT_dopesheet_automation_menu)
+
     bpy.types.DOPESHEET_MT_key.remove(draw_dopesheet_key_menu)
+    bpy.types.GRAPH_MT_key.remove(draw_dopesheet_key_menu)
+    bpy.types.TIME_MT_editor_menus.remove(draw_timeline_menu)
