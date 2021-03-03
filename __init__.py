@@ -20,11 +20,11 @@ Created by Samy Tichadou
 
 bl_info = {
     "name": "Puppeteer",
-    "description": "Automation for blender animation",
+    "description": "Automation for animation",
     "author": "Samy Tichadou (tonton)",
     "version": (0, 1, 0),
     "blender": (2, 91, 2),
-    "location": "Sidebar > Grease Pencil > Grease Pencil Tools",
+    "location": "Sidebar > Puppeteer",
     "warning": "",
     "doc_url": "https://github.com/samytichadou/puppeteer_blender_addon",
     "tracker_url": "https://github.com/samytichadou/puppeteer_blender_addon/issues/new",
@@ -49,6 +49,7 @@ from .operators import (
     automation_actions,
     create_automation,
     puppet_modal,
+    check_new_version,
 )
 
 
@@ -68,6 +69,7 @@ def register():
     automation_actions.register()
     create_automation.register()
     puppet_modal.register()
+    check_new_version.register()
 
 def unregister():
 
@@ -81,3 +83,4 @@ def unregister():
     automation_actions.unregister()
     create_automation.unregister()
     puppet_modal.unregister()
+    check_new_version.unregister()

@@ -36,6 +36,8 @@ class PUPT_PF_Addon_Prefs(bpy.types.AddonPreferences):
         # update warning
         draw_update_needed_warning(layout, context.scene.pupt_properties)
 
+        layout.operator("pupt.check_new_version")
+
         row = layout.row(align = True)
         row.label(text = "UI Text")
         row.prop(self, "ui_text_color", text = "")
