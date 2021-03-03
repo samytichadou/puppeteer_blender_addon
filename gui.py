@@ -143,6 +143,13 @@ class PUPT_PT_viewport_keyframes_subpanel(bpy.types.Panel):
 
             col1.label(text = "Additive Value :")
             col2.label(text = str(a_kf.fcurve_additive_value))
+
+
+# key menu entry for creating automation
+def draw_dopesheet_key_menu(self, context):
+    layout = self.layout
+    layout.separator()
+    layout.operator("pupt.create_automation")
         
 
 ### REGISTER ---
@@ -150,7 +157,9 @@ class PUPT_PT_viewport_keyframes_subpanel(bpy.types.Panel):
 def register():
     bpy.utils.register_class(PUPT_PT_viewport_panel)
     bpy.utils.register_class(PUPT_PT_viewport_keyframes_subpanel)
+    bpy.types.DOPESHEET_MT_key.append(draw_dopesheet_key_menu)
 
 def unregister():
     bpy.utils.unregister_class(PUPT_PT_viewport_panel)
     bpy.utils.unregister_class(PUPT_PT_viewport_keyframes_subpanel)
+    bpy.types.DOPESHEET_MT_key.remove(draw_dopesheet_key_menu)
