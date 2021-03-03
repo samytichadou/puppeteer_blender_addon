@@ -41,6 +41,7 @@ from . import   (
     properties,
     gui,
     ui_lists,
+    version_check,
 )
 
 from .operators import (
@@ -61,6 +62,7 @@ def register():
     properties.register()
     gui.register()
     ui_lists.register()
+    version_check.register()
 
     automation_set_actions.register()
     automation_actions.register()
@@ -73,6 +75,7 @@ def unregister():
     properties.unregister()
     gui.unregister()
     ui_lists.unregister()
+    version_check.unregister()
 
     automation_set_actions.unregister()
     automation_actions.unregister()

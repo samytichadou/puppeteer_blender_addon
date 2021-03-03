@@ -50,7 +50,7 @@ def check_addon_version():
 
     print("Puppeteer --- Checking for new version")
 
-    props = bpy.context.pupt_properties
+    props = bpy.context.scene.pupt_properties
     
     if not is_connected():
         clear_update_properties(props)
