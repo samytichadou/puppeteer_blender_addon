@@ -172,7 +172,7 @@ def create_keyframe_from_parent(keyframe, current_frame, additive):
 
 
 class PUPT_OT_Puppet_Modal(bpy.types.Operator):
-    """Draw a line with the mouse"""
+    """Animate through assigned shortcut"""
     bl_idname = "pupt.puppet_modal"
     bl_label = "Puppet"
     bl_options = {"UNDO"} #, "INTERNAL"}
@@ -210,6 +210,8 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
 
         for area in context.screen.areas:
             area.tag_redraw()
+
+        self.report({'INFO'}, "%s Automation Applied" % automation.name)
 
 
     def modal(self, context, event):
