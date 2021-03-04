@@ -30,6 +30,11 @@ class PUPT_PF_Addon_Prefs(bpy.types.AddonPreferences):
             description = "Hold Shift to active Additive Mode instead of toggling it"
         )
 
+    debug : bpy.props.BoolProperty(
+            name = "Debug",
+            description = "Add some debug print statement in the console",
+        )
+
     def draw(self, context):
         layout = self.layout
 
@@ -44,6 +49,8 @@ class PUPT_PF_Addon_Prefs(bpy.types.AddonPreferences):
         row.prop(self, "ui_text_size", text = "Size")
 
         layout.prop(self, "hold_additive", text = "Hold Shift for Additive mode")
+
+        layout.prop(self, "debug")
  
 
 # get addon preferences

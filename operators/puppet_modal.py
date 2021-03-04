@@ -107,36 +107,44 @@ def change_paste_mode(context):
         props["paste_mode"] = 0
 
 
-def create_keyframe_from_parent(keyframe, current_frame, additive):
-
-    if not keyframe.parent_name:
-        print("Puppeteer --- Skip keyframe without parent name") #debug
-        return
-
-    print("Puppeteer --- Pasting keyframe") #debug
-
-    # get direct parent
+# get parent object from name
+def get_parent_object(parent_type, parent_name):
     parent = None
-    if keyframe.parent_type == "OBJECT":
-        parent = bpy.data.objects[keyframe.parent_name]
-    elif keyframe.parent_type == "MATERIAL":
-        parent = bpy.data.materials[keyframe.parent_name]
-    elif keyframe.parent_type == "WORLD":
-        parent = bpy.data.worlds[keyframe.parent_name]
+
+    if parent_type == "OBJECT":
+        try:
+            parent = bpy.data.objects[parent_name]
+        except KeyError:
+            return parent
+    elif parent_type == "MATERIAL":
+        try:
+            parent = bpy.data.materials[parent_name]
+        except KeyError:
+            return parent
+    elif parent_type == "WORLD":
+        try:
+            parent = bpy.data.worlds[parent_name]
+        except KeyError:
+            return parent
     # nodes
-    elif keyframe.parent_type in {"MATERIAL_NTREE", "WORLD_NTREE"}:
-        if keyframe.parent_type == "MATERIAL_NTREE":
-            parent = bpy.data.materials[keyframe.parent_name].node_tree
-        elif keyframe.parent_type == "WORLD_NTREE":
-            parent = bpy.data.worlds[keyframe.parent_name].node_tree
+    elif parent_type in {"MATERIAL_NTREE", "WORLD_NTREE"}:
+        if parent_type == "MATERIAL_NTREE":
+            try:
+                parent = bpy.data.materials[parent_name].node_tree
+            except KeyError:
+                return parent
+        elif parent_type == "WORLD_NTREE":
+            try:
+                parent = bpy.data.worlds[parent_name].node_tree
+            except KeyError:
+                return parent
+    
+    return parent
 
-    if parent is None:
-        print("Puppeteer --- Skip keyframe, unable to find parent") #debug
-        return
 
-    print("Puppeteer --- Parent to paste %s" % parent.name) #debug
+# get fcurve
+def get_fcurve_object(parent, data_path, array_index, group):
 
-    # find fcurve
     if parent.animation_data is None:
         parent.animation_data_create()
     a_d = parent.animation_data
@@ -145,23 +153,49 @@ def create_keyframe_from_parent(keyframe, current_frame, additive):
         new_name = get_unique_name(bpy.data.actions, parent.name + "Action")
         a_d.action = bpy.data.actions.new(new_name)
 
-    fc = a_d.action.fcurves.find(keyframe.fcurve_data_path, index = keyframe.fcurve_array_index)
+    fc = a_d.action.fcurves.find(data_path, index = array_index)
     if fc is None:
-        fc = a_d.action.fcurves.new(keyframe.fcurve_data_path, index = keyframe.fcurve_array_index, action_group = keyframe.fcurve_group)
-    print("Puppeteer --- Fcurve to paste %s" % fc.data_path) #debug
+        fc = a_d.action.fcurves.new(data_path, index = array_index, action_group = group)
+
+    return fc
+
+    
+def create_keyframe_from_parent(keyframe, current_frame, additive):
+    
+    debug = get_addon_preferences().debug
+
+    if not keyframe.parent_name:
+        if debug: print("Puppeteer --- Skip keyframe without parent name") #debug
+        return False
+
+    if debug: print("Puppeteer --- Pasting keyframe") #debug
+
+    # get parent   
+    parent = get_parent_object(keyframe.parent_type, keyframe.parent_name)
+    
+    if parent is None:
+        if debug: print("Puppeteer --- Skip keyframe, unable to find parent") #debug
+        return False
+
+    if debug: print("Puppeteer --- Parent to paste %s" % parent.name) #debug
+
+    # find fcurve
+    fc = get_fcurve_object(parent, keyframe.fcurve_data_path, keyframe.fcurve_array_index, keyframe.fcurve_group)
+    
+    if debug: print("Puppeteer --- Fcurve to paste %s" % fc.data_path) #debug
 
     # process value
     if additive:
         value = fc.evaluate(current_frame) + keyframe.fcurve_additive_value
     else:
         value = keyframe.fcurve_value
-    print("Puppeteer --- Value to paste %f" % value) #debug
+    if debug: print("Puppeteer --- Value to paste %f" % value) #debug
 
     new_key = fc.keyframe_points.insert(
         current_frame + keyframe.fcurve_frame,
         value
         )
-    print("Puppeteer --- Setting pasted keyframe") #debug
+    if debug: print("Puppeteer --- Setting pasted keyframe") #debug
 
     new_key.handle_left[0] = current_frame + keyframe.handle_left[0]
     new_key.handle_left[1] = value + keyframe.handle_left[1]
@@ -170,7 +204,9 @@ def create_keyframe_from_parent(keyframe, current_frame, additive):
     new_key.handle_right[1] = value + keyframe.handle_right[1]
     new_key.handle_right_type = keyframe.handle_right_type
 
-    print("Puppeteer --- Keyframe set") #debug
+    if debug: print("Puppeteer --- Keyframe set") #debug
+
+    return True
 
 
 class PUPT_OT_Puppet_Modal(bpy.types.Operator):
@@ -208,6 +244,8 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
         for kf in automation.keyframe:
             if props.paste_mode == "PARENT":
                 create_keyframe_from_parent(kf, current_frame, props.additive_keyframing)
+                if not create_keyframe_from_parent(kf, current_frame, props.additive_keyframing):
+                    print("Puppeteer --- Unable to paste keyframe")
 
         for area in context.screen.areas:
             area.tag_redraw()

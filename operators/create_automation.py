@@ -3,6 +3,7 @@ import bpy
 
 from .automation_set_actions import add_item_to_collection
 from ..properties import key_assignment_callback
+from ..addon_prefs import get_addon_preferences
 
 
 # enum callback for automation set
@@ -79,6 +80,8 @@ def return_parent_action(context, fcurve):
 # keyframe infos
 def add_keyframes_to_collection(context, collection):
 
+    debug = get_addon_preferences().debug
+
     fc_keyframes = []
     frames = []
     automation_check = False
@@ -92,6 +95,8 @@ def add_keyframes_to_collection(context, collection):
         if not fc_keyframes:
             continue
 
+        if debug: print("Puppeteer --- Getting keyframes for FCurve %s" % fc.data_path) #debug
+
         #get initial frame/value
         init_keyframe = get_init_keyframe(fc_keyframes)
         frames.append(init_keyframe.co[0])
@@ -102,6 +107,7 @@ def add_keyframes_to_collection(context, collection):
 
         # ignore fcurve if undetailed parent type (NodeGroups)
         if parent_type is None:
+            if debug: print("Puppeteer --- FCurve type not supported") #debug
             continue
 
         automation_check = True
@@ -134,15 +140,20 @@ def add_keyframes_to_collection(context, collection):
             new_key.handle_left_type = kf.handle_left_type
             new_key.handle_right_type = kf.handle_right_type
 
+        if debug: print("Puppeteer --- Recorded %i keyframes" % len(fc_keyframes)) #debug
+
     
     # set relative frames
-    if frames:
+    if automation_check:
+        if debug: print("Puppeteer --- Setting origin frames for added keyframes") #debug
         origin_frame = min(frames)
         
         for kf in collection.keyframe:
             kf.fcurve_frame = kf.fcurve_frame - origin_frame
             kf.handle_left[0] = kf.handle_left[0] - origin_frame
             kf.handle_right[0] = kf.handle_right[0] - origin_frame
+
+    if debug: print("Puppeteer --- Available keyframes recorded and set") #debug
 
     return automation_check
           
