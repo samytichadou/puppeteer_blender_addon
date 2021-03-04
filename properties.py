@@ -25,9 +25,10 @@ def key_assignment_update(self, context):
     if props.bypass_update_tag:
         return
 
-    a_set, a_automation = return_active_set_automation(context)
+    set_string = self.path_from_id().split(".automation[")[0]
+    parent_set = self.id_data.path_resolve(set_string)
 
-    for a in a_set.automation:
+    for a in parent_set.automation:
         if a != self:
             if a.key_assignment == self.key_assignment:
                 props.bypass_update_tag = True
