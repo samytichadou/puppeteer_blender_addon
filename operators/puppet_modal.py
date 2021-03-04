@@ -142,8 +142,10 @@ def get_parent_object(parent_type, parent_name):
     return parent
 
 
-# get fcurve
-def get_fcurve_object(parent, data_path, array_index, group):
+# get fcurve from parent object
+def get_fcurve_parent(parent, data_path, array_index, group):
+
+    fc = None
 
     if parent.animation_data is None:
         parent.animation_data_create()
@@ -159,28 +161,103 @@ def get_fcurve_object(parent, data_path, array_index, group):
 
     return fc
 
+
+# get fcurve from action name
+def get_fcurve_action(action_name, data_path, array_index, group):
     
-def create_keyframe_from_parent(keyframe, current_frame, additive):
+    fc = None
+    
+    for act in bpy.data.actions:
+        if act.name == action_name:
+            fc = act.fcurves.find(data_path, index = array_index)
+            if fc is None:
+                fc = act.fcurves.new(data_path, index = array_index, action_group = group)
+            break
+
+    return fc
+
+
+# get fcurve from parent and action
+def get_fcurve_parent_action(parent, action_name, data_path, array_index, group):
+
+    fc = None
+
+    if parent.animation_data is None:
+        parent.animation_data_create()
+    a_d = parent.animation_data
+
+    if a_d.action is not None:
+        if a_d.action.name == action_name:
+            fc = a_d.action.fcurves.find(data_path, index = array_index)
+            if fc is None:
+                fc = a_d.action.fcurves.new(data_path, index = array_index, action_group = group)
+
+    return fc
+
+
+# create and set keyframe
+def set_keyframe(fcurve, value, keyframe_from_coll, current_frame):
+
+    new_key = fcurve.keyframe_points.insert(
+        current_frame + keyframe_from_coll.fcurve_frame,
+        value
+        )
+
+    new_key.handle_left[0] = current_frame + keyframe_from_coll.handle_left[0]
+    new_key.handle_left[1] = value + keyframe_from_coll.handle_left[1]
+    new_key.handle_left_type = keyframe_from_coll.handle_left_type
+    new_key.handle_right[0] = current_frame + keyframe_from_coll.handle_right[0]
+    new_key.handle_right[1] = value + keyframe_from_coll.handle_right[1]
+    new_key.handle_right_type = keyframe_from_coll.handle_right_type
+
+
+def set_keyframe_from_paste_mode(keyframe, current_frame, additive, paste_mode):
     
     debug = get_addon_preferences().debug
 
-    if not keyframe.parent_name:
-        if debug: print("Puppeteer --- Skip keyframe without parent name") #debug
+    if paste_mode in {"PARENT", "PARENT_ACTION"}:
+
+        if not keyframe.parent_name:
+            if debug: print("Puppeteer --- Skip keyframe without parent name") #debug
+            return False
+
+        if debug: print("Puppeteer --- Pasting keyframe") #debug
+
+        # get parent   
+        parent = get_parent_object(keyframe.parent_type, keyframe.parent_name)
+        
+        if parent is None:
+            if debug: print("Puppeteer --- Skip keyframe, unable to find parent") #debug
+            return False
+
+        if debug: print("Puppeteer --- Parent to paste %s" % parent.name) #debug
+
+        # find fcurve
+        if paste_mode == "PARENT":
+            fc = get_fcurve_parent(
+                parent, 
+                keyframe.fcurve_data_path, 
+                keyframe.fcurve_array_index, 
+                keyframe.fcurve_group
+                )
+
+        elif paste_mode == "PARENT_ACTION":
+            fc = get_fcurve_parent_action(
+                parent, 
+                keyframe.action_name, 
+                keyframe.fcurve_data_path, 
+                keyframe.fcurve_array_index, 
+                keyframe.fcurve_group
+                )
+
+    elif paste_mode == "ACTION":
+
+        # find fcurve
+        fc = get_fcurve_action(keyframe.action_name, keyframe.fcurve_data_path, keyframe.fcurve_array_index, keyframe.fcurve_group)
+
+    if fc is None:
+        if debug: print("Puppeteer --- Skip keyframe, unable to find FCurve") #debug
         return False
-
-    if debug: print("Puppeteer --- Pasting keyframe") #debug
-
-    # get parent   
-    parent = get_parent_object(keyframe.parent_type, keyframe.parent_name)
-    
-    if parent is None:
-        if debug: print("Puppeteer --- Skip keyframe, unable to find parent") #debug
-        return False
-
-    if debug: print("Puppeteer --- Parent to paste %s" % parent.name) #debug
-
-    # find fcurve
-    fc = get_fcurve_object(parent, keyframe.fcurve_data_path, keyframe.fcurve_array_index, keyframe.fcurve_group)
     
     if debug: print("Puppeteer --- Fcurve to paste %s" % fc.data_path) #debug
 
@@ -189,20 +266,12 @@ def create_keyframe_from_parent(keyframe, current_frame, additive):
         value = fc.evaluate(current_frame) + keyframe.fcurve_additive_value
     else:
         value = keyframe.fcurve_value
+
     if debug: print("Puppeteer --- Value to paste %f" % value) #debug
 
-    new_key = fc.keyframe_points.insert(
-        current_frame + keyframe.fcurve_frame,
-        value
-        )
-    if debug: print("Puppeteer --- Setting pasted keyframe") #debug
+    if debug: print("Puppeteer --- Setting keyframe") #debug
 
-    new_key.handle_left[0] = current_frame + keyframe.handle_left[0]
-    new_key.handle_left[1] = value + keyframe.handle_left[1]
-    new_key.handle_left_type = keyframe.handle_left_type
-    new_key.handle_right[0] = current_frame + keyframe.handle_right[0]
-    new_key.handle_right[1] = value + keyframe.handle_right[1]
-    new_key.handle_right_type = keyframe.handle_right_type
+    set_keyframe(fc, value, keyframe, current_frame)
 
     if debug: print("Puppeteer --- Keyframe set") #debug
 
@@ -242,10 +311,11 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
             return
 
         for kf in automation.keyframe:
-            if props.paste_mode == "PARENT":
-                create_keyframe_from_parent(kf, current_frame, props.additive_keyframing)
-                if not create_keyframe_from_parent(kf, current_frame, props.additive_keyframing):
-                    print("Puppeteer --- Unable to paste keyframe")
+            chk_paste = True
+            chk_paste = set_keyframe_from_paste_mode(kf, current_frame, props.additive_keyframing, props.paste_mode)
+
+            if not chk_paste:
+                print("Puppeteer --- Unable to paste keyframe")
 
         for area in context.screen.areas:
             area.tag_redraw()
