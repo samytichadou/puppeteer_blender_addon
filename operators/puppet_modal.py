@@ -114,7 +114,7 @@ def create_keyframe_from_parent(keyframe, current_frame, additive):
         return
 
     print("Puppeteer --- Pasting keyframe") #debug
-    
+
     # get direct parent
     parent = None
     if keyframe.parent_type == "OBJECT":
@@ -220,28 +220,28 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
         props = context.scene.pupt_properties
         
         # special shortcuts
-        if event.type in event_list.shortcut_event and event.value == "PRESS":
+        if event.type in event_list.shortcut_event:
             # ESC
-            if event.type == 'ESC':
+            if event.type == 'ESC' and event.value == "PRESS":
                 self.finish(context)
                 return {'FINISHED'}
             # SPACE
-            elif event.type == 'SPACE':
+            elif event.type == 'SPACE' and event.value == "PRESS":
                 if not context.screen.is_animation_playing:
                     bpy.ops.screen.animation_play()
                 else:
                     bpy.ops.screen.animation_cancel(restore_frame = False)
             # DWN ARROW
-            elif event.type == "DOWN_ARROW":
+            elif event.type == "DOWN_ARROW" and event.value == "PRESS":
                 change_active_set(context, "dwn")
             # UP ARROW
-            elif event.type == "UP_ARROW":
+            elif event.type == "UP_ARROW" and event.value == "PRESS":
                 change_active_set(context, "up")
             # H
             elif event.type == "H":
                 self.show_help = not self.show_help
             # CTL
-            elif event.type in {"LEFT_CTRL", "RIGHT_CTRL"}:
+            elif event.type in {"LEFT_CTRL", "RIGHT_CTRL"} and event.value == "PRESS":
                 change_paste_mode(context)
             # SHIFT
             elif event.type in {"LEFT_SHIFT", "RIGHT_SHIFT"}:
@@ -274,6 +274,11 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
             self.report({"WARNING"}, "Active space must be a View3d")
             return {"CANCELLED"}
 
+        # reset additive if needed
+        if get_addon_preferences().hold_additive:
+            self._old_additive = context.scene.pupt_properties.additive_keyframing
+            context.scene.pupt_properties.additive_keyframing = False
+
         # draw
         args = (self, context)
         self._handle = bpy.types.SpaceView3D.draw_handler_add(draw_puppet_helper_callback_px, args, 'WINDOW', 'POST_PIXEL')
@@ -285,6 +290,8 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
 
 
     def finish(self, context):
+        if get_addon_preferences().hold_additive:
+            context.scene.pupt_properties.additive_keyframing = self._old_additive
         bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
 
 
