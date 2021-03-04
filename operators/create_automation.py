@@ -194,13 +194,13 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
  
     def draw(self, context):
         layout = self.layout
-        layout.prop(self, "automation_set")
+        layout.prop(self, "automation_set", text = "Set")
 
         if self.automation_set == "CREATE_NEW":
-            layout.prop(self, "new_automation_set_name")
+            layout.prop(self, "new_automation_set_name", text = "Set Name")
 
-        layout.prop(self, "automation_name")
-        layout.prop(self, "key_assignment")
+        layout.prop(self, "automation_name", text = "Name")
+        layout.prop(self, "key_assignment", text = "Key")
         
     def execute(self, context):
 
