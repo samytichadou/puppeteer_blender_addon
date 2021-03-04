@@ -53,15 +53,11 @@ used_event = [
     "SEVEN",
     "EIGHT",
     "NINE",
-    
-    "LEFT_ALT",
-    "RIGHT_ALT",
 
     "OSKEY",
     "APP",
     "GRLESS",
 
-    "TAB",
     "RET",
     "LINE_FEED",
     "BACK_SPACE",
@@ -194,11 +190,10 @@ shortcut_event = [
 
     "H",
 
-    "LEFT_CTRL",
-    "RIGHT_CTRL",
+    "LEFT_ALT",
+    "RIGHT_ALT",
 
-    "LEFT_SHIFT",
-    "RIGHT_SHIFT",
+    "TAB",
 
     ]
 
@@ -227,5 +222,11 @@ passthrough_event = [
 
     "LEFT_ARROW",
     "RIGHT_ARROW",
+
+    "LEFT_CTRL",
+    "RIGHT_CTRL",
+
+    "LEFT_SHIFT",
+    "RIGHT_SHIFT",
 
     ]

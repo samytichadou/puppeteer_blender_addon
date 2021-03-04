@@ -27,7 +27,7 @@ class PUPT_PF_Addon_Prefs(bpy.types.AddonPreferences):
 
     hold_additive : bpy.props.BoolProperty(
             name = "Hold Additive",
-            description = "Hold Shift to active Additive Mode instead of toggling it"
+            description = "Hold Alt to active Additive Mode instead of toggling it"
         )
 
     debug : bpy.props.BoolProperty(

@@ -58,11 +58,11 @@ def draw_puppet_helper_callback_px(self, context):
         l_pos += line_offset
         draw_text_line(font_id, right_mg, l_pos, "Esc/Enter - Quit")
         l_pos += line_offset
-        draw_text_line(font_id, right_mg, l_pos, "Shift - Additive Keyframing")
+        draw_text_line(font_id, right_mg, l_pos, "Alt - Additive Keyframing")
         l_pos += line_offset
         draw_text_line(font_id, right_mg, l_pos, "Up/Down - Automation Set")
         l_pos += line_offset
-        draw_text_line(font_id, right_mg, l_pos, "Ctrl - Paste Mode")
+        draw_text_line(font_id, right_mg, l_pos, "Tab - Paste Mode")
 
         l_pos += 5
         for a in reversed(a_set.automation):
@@ -278,11 +278,11 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
             # H
             elif event.type == "H":
                 self.show_help = not self.show_help
-            # CTL
-            elif event.type in {"LEFT_CTRL", "RIGHT_CTRL"} and event.value == "PRESS":
+            # TAB
+            elif event.type == "TAB" and event.value == "PRESS":
                 change_paste_mode(context)
-            # SHIFT
-            elif event.type in {"LEFT_SHIFT", "RIGHT_SHIFT"}:
+            # ALT
+            elif event.type in {"LEFT_ALT", "RIGHT_ALT"}:
                 # toggle additive
                 if get_addon_preferences().hold_additive:
                     # hold shift to additive

@@ -31,7 +31,7 @@ def draw_key_assign_helper_callback_px(self, context):
 
     l_pos += 5
     l_pos += line_offset
-    draw_text_line(font_id, right_mg, l_pos, "%s Automation" % a_automation.name)
+    draw_text_line(font_id, right_mg, l_pos, "Automation : %s" % a_automation.name)
     l_pos += line_offset
     draw_text_line(font_id, right_mg, l_pos, "Waiting for Keyboard Entry")
 
@@ -66,16 +66,13 @@ class PUPT_OT_Assign_Key(bpy.types.Operator):
             self.execute(context)
             return {'FINISHED'}
 
-        elif event.type in event_list.shortcut_event and event.value == "PRESS":
-            if event.type == "ESC":
-                self.cancel(context)
-                return {'CANCELLED'}
-            else:
-                self.report({"INFO"}, "Unavailable key")
-
-        elif event.type in {"LEFTMOUSE", "RIGHTMOUSE"}:
-            self.cancel(context)
-            return {'CANCELLED'}
+        elif event.type in event_list.shortcut_event or event.type in event_list.passthrough_event:
+            if event.value == "PRESS":
+                if event.type in {"LEFTMOUSE", "RIGHTMOUSE", "ESC"}:
+                    self.cancel(context)
+                    return {'CANCELLED'}
+                else:
+                    self.report({"INFO"}, "Unavailable key")
 
         return {'RUNNING_MODAL'}
 
