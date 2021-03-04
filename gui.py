@@ -47,7 +47,9 @@ class PUPT_PT_viewport_panel(bpy.types.Panel):
 
         # general
         layout.operator("pupt.puppet_modal")
+       
         layout.prop(props, "paste_mode", text = "Paste")
+        layout.prop(props, "additive_keyframing")
 
         # sets
         layout.label(text = "Automation Sets")
@@ -115,6 +117,9 @@ class PUPT_PT_viewport_automations_subpanel(bpy.types.Panel):
             row.operator("pupt.assign_key", text = "", icon = "EVENT_SPACEKEY")
             row.prop(active_automation, "key_assignment", text = "")
 
+            if not active_automation.keyframe:
+                layout.label(text = "No Keyframes")
+
 
 # keyframe subpanel
 class PUPT_PT_viewport_keyframes_subpanel(bpy.types.Panel):
@@ -143,46 +148,60 @@ class PUPT_PT_viewport_keyframes_subpanel(bpy.types.Panel):
 
         layout.template_list("PUPT_UL_keyframes", "", a_automation, "keyframe", a_automation, "keyframe_index", rows = 2)
 
-        # keyframe details
-        if a_automation.keyframe_index in range(0, len(a_automation.keyframe)):
-            a_kf = a_automation.keyframe[a_automation.keyframe_index]
 
-            split = layout.split()
+# keyframe properties subpanel
+class PUPT_PT_viewport_keyframes_properties_subpanel(bpy.types.Panel):
+    bl_label = "Properties"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_parent_id = "PUPT_PT_viewport_keyframes_subpanel"
+    bl_options = {'DEFAULT_CLOSED'}
+ 
+    @classmethod
+    def poll(cls, context):
+        a_set, a_automation = return_active_set_automation(context)
+        if a_automation is not None:
+            if a_automation.keyframe_index in range(0, len(a_automation.keyframe)):
+                return True
+ 
+    def draw(self, context):
 
-            col1 = split.column(align=True)
-            col2 = split.column(align=True)
-            
-            col1.label(text = "Parent :")
-            col2.label(text = a_kf.parent_name)
+        layout = self.layout
 
-            col1.label(text = "Type :")
-            col2.label(text = a_kf.parent_type)
+        a_set, a_automation = return_active_set_automation(context)
+        a_kf = a_automation.keyframe[a_automation.keyframe_index]
 
-            col1.label(text = "Action :")
-            col2.label(text = a_kf.action_name)
+        split = layout.split()
 
-            if "_NTREE" in a_kf.parent_type:
-                col1.label(text = "Node :")
-                col2.label(text = a_kf.node_name)
+        col1 = split.column(align=True)
+        col2 = split.column(align=True)
+        
+        col1.label(text = "Parent :")
+        col2.label(text = a_kf.parent_name)
 
-                col1.label(text = "Socket :")
-                col2.label(text = a_kf.socket_type + "[%i]" % a_kf.socket_index)
+        col1.label(text = "Type :")
+        col2.label(text = a_kf.parent_type)
 
-            elif "_POSE" in a_kf.parent_type:
-                col1.label(text = "Bone :")
-                col2.label(text = a_kf.bone_name)
+        col1.label(text = "Action :")
+        col2.label(text = a_kf.action_name)
 
-            col1.label(text = "FCurve :")
-            col2.label(text = a_kf.fcurve_data_path + "[%i]" % a_kf.fcurve_array_index)
+        col1.label(text = "FCurve :")
+        col2.label(text = a_kf.fcurve_data_path + "[%i]" % a_kf.fcurve_array_index)
 
-            col1.label(text = "Frame :")
-            col2.label(text = str(a_kf.fcurve_frame))
+        col1.label(text = "Frame :")
+        col2.label(text = str(a_kf.fcurve_frame))
 
-            col1.label(text = "Value :")
-            col2.label(text = str(a_kf.fcurve_value))
+        col1.label(text = "Value :")
+        col2.label(text = str(a_kf.fcurve_value))
 
-            col1.label(text = "Additive Value :")
-            col2.label(text = str(a_kf.fcurve_additive_value))
+        col1.label(text = "Additive Value :")
+        col2.label(text = str(a_kf.fcurve_additive_value))
+
+        col1.label(text = "Left Handle :")
+        col2.label(text = a_kf.handle_left_type)
+
+        col1.label(text = "Right Handle :")
+        col2.label(text = a_kf.handle_right_type)
 
 
 class PUPT_MT_dopesheet_automation_menu(bpy.types.Menu):
@@ -213,6 +232,7 @@ def register():
     bpy.utils.register_class(PUPT_PT_viewport_panel)
     bpy.utils.register_class(PUPT_PT_viewport_automations_subpanel)
     bpy.utils.register_class(PUPT_PT_viewport_keyframes_subpanel)
+    bpy.utils.register_class(PUPT_PT_viewport_keyframes_properties_subpanel)
     bpy.utils.register_class(PUPT_MT_dopesheet_automation_menu)
 
     bpy.types.DOPESHEET_MT_key.append(draw_dopesheet_key_menu)
@@ -223,6 +243,7 @@ def unregister():
     bpy.utils.unregister_class(PUPT_PT_viewport_panel)
     bpy.utils.unregister_class(PUPT_PT_viewport_automations_subpanel)
     bpy.utils.unregister_class(PUPT_PT_viewport_keyframes_subpanel)
+    bpy.utils.unregister_class(PUPT_PT_viewport_keyframes_properties_subpanel)
     bpy.utils.unregister_class(PUPT_MT_dopesheet_automation_menu)
 
     bpy.types.DOPESHEET_MT_key.remove(draw_dopesheet_key_menu)

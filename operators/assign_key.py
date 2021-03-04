@@ -66,13 +66,12 @@ class PUPT_OT_Assign_Key(bpy.types.Operator):
             self.execute(context)
             return {'FINISHED'}
 
-        elif event.type in event_list.shortcut_event or event.type in event_list.modifier_event:
-            if event.value == "PRESS":
-                if event.type == "ESC":
-                    self.cancel(context)
-                    return {'CANCELLED'}
-                else:
-                    self.report({"INFO"}, "Unavailable key")
+        elif event.type in event_list.shortcut_event and event.value == "PRESS":
+            if event.type == "ESC":
+                self.cancel(context)
+                return {'CANCELLED'}
+            else:
+                self.report({"INFO"}, "Unavailable key")
 
         elif event.type in {"LEFTMOUSE", "RIGHTMOUSE"}:
             self.cancel(context)

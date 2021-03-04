@@ -48,10 +48,7 @@ def return_parent_action(context, fcurve):
     for ob in context.scene.objects:
         if ob.animation_data:
             if action == ob.animation_data.action:
-                if "pose.bones" in fcurve.data_path:
-                    return ob, "OBJECT_POSE"
-                else:
-                    return ob, "OBJECT"
+                return ob, "OBJECT"
 
     # materials and nodetree
     for ma in bpy.data.materials:
@@ -77,33 +74,6 @@ def return_parent_action(context, fcurve):
                 return wo, "WORLD_NTREE"
 
     return None, None
-
-
-# split nodes data path and format it
-def split_nodes_data_path(long_data_path):
-
-    node_name = long_data_path.split('nodes["')[1].split('"]')[0]
-
-    shorten = long_data_path.split('"].')[1]
-
-    socket = shorten.split('[')[0]
-    socket_index = shorten.split('[')[1].split(']')[0]
-
-    data_path = shorten.split('].')[1]
-
-    return node_name, socket, socket_index, data_path
-
-
-# split pose data path and format it 
-def split_pose_data_path(long_data_path):
-
-    shorten = long_data_path.split("pose.")[1]
-
-    bone_name = shorten.split('["')[1].split('"].')[0]
-
-    data_path = shorten.split('].')[1]
-
-    return bone_name, data_path
 
 
 # keyframe infos
@@ -136,17 +106,6 @@ def add_keyframes_to_collection(context, collection):
 
         automation_check = True
 
-        if "_NTREE" in parent_type:
-            node_infos = split_nodes_data_path(fc.data_path)
-            #[0]node_name, [1]socket, [2]socket_index, [3]data_path
-            data_path = node_infos[3]
-        elif "_POSE" in parent_type:
-            pose_infos = split_pose_data_path(fc.data_path)
-            #[0]bone_name, [1]data_path
-            data_path = pose_infos[1]
-        else:
-            data_path = fc.data_path
-
         for kf in fc_keyframes:
 
             new_key = collection.keyframe.add()
@@ -158,25 +117,22 @@ def add_keyframes_to_collection(context, collection):
 
             new_key.action_name = fc.id_data.name
 
-            new_key.fcurve_data_path = data_path
+            new_key.fcurve_data_path = fc.data_path
             new_key.fcurve_array_index = fc.array_index
+            if fc.group:
+                new_key.fcurve_group = fc.group.name
 
             new_key.fcurve_frame = kf.co[0]
             new_key.fcurve_value = kf.co[1]
             new_key.fcurve_additive_value = kf.co[1] - init_value
 
-            new_key.handle_left = kf.handle_left
-            new_key.handle_right = kf.handle_right
+            # set as additive value
+            new_key.handle_left[0] = kf.handle_left[0]
+            new_key.handle_left[1] = kf.handle_left[1] - kf.co[1]
+            new_key.handle_right[0] = kf.handle_right[0]
+            new_key.handle_right[1] = kf.handle_right[1] - kf.co[1]
             new_key.handle_left_type = kf.handle_left_type
             new_key.handle_right_type = kf.handle_right_type
-
-            if "_NTREE" in parent_type:
-                new_key.node_name = node_infos[0]
-                new_key.socket_type = node_infos[1].upper()
-                new_key.socket_index = int(node_infos[2])
-
-            elif "_POSE" in parent_type:
-                new_key.bone_name = pose_infos[0]
 
     
     # set relative frames
@@ -185,6 +141,8 @@ def add_keyframes_to_collection(context, collection):
         
         for kf in collection.keyframe:
             kf.fcurve_frame = kf.fcurve_frame - origin_frame
+            kf.handle_left[0] = kf.handle_left[0] - origin_frame
+            kf.handle_right[0] = kf.handle_right[0] - origin_frame
 
     return automation_check
           
@@ -208,9 +166,10 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        for fc in context.visible_fcurves:
-            if return_selected_keyframes(fc):
-                return True
+        if context.visible_fcurves:
+            for fc in context.visible_fcurves:
+                if return_selected_keyframes(fc):
+                    return True
  
     def invoke(self, context, event):
         pupt_props = context.scene.pupt_properties

@@ -53,11 +53,9 @@ used_event = [
     "SEVEN",
     "EIGHT",
     "NINE",
-
-    "LEFT_CTRL",
+    
     "LEFT_ALT",
     "RIGHT_ALT",
-    "RIGHT_CTRL",
 
     "OSKEY",
     "APP",
@@ -196,13 +194,12 @@ shortcut_event = [
 
     "H",
 
-    ]
-
-modifier_event = [
+    "LEFT_CTRL",
+    "RIGHT_CTRL",
 
     "LEFT_SHIFT",
     "RIGHT_SHIFT",
-    
+
     ]
 
 passthrough_event = [

@@ -44,7 +44,6 @@ class PUPT_PR_automation_keyframe(bpy.types.PropertyGroup) :
         name = "Parent Type",
         items = (
             ('OBJECT', "Object", ""),
-            ('OBJECT_POSE', "Object Pose", ""),
             ('MATERIAL', "Material", ""),
             ('MATERIAL_NTREE', "Material NTree", ""),
             ('WORLD', "World", ""),
@@ -55,6 +54,7 @@ class PUPT_PR_automation_keyframe(bpy.types.PropertyGroup) :
 
     action_name : bpy.props.StringProperty(name = "Action Name")
 
+    # fcurves
     fcurve_data_path : bpy.props.StringProperty(name = "Fcurve Data Path")
     fcurve_array_index : bpy.props.IntProperty(name = "Fcurve Array Index")
 
@@ -62,19 +62,7 @@ class PUPT_PR_automation_keyframe(bpy.types.PropertyGroup) :
     fcurve_value : bpy.props.FloatProperty(name = "Fcurve Value")
     fcurve_additive_value : bpy.props.FloatProperty(name = "Fcurve Additive Value")
 
-    # nodes specific
-    node_name : bpy.props.StringProperty(name = "Node Name")
-    socket_type : bpy.props.EnumProperty(
-        name = "Socket Type",
-        items = (
-            ('INPUTS', "Inputs", ""),
-            ('OUTPUTS', "Outputs", ""),
-            ),
-        )
-    socket_index : bpy.props.IntProperty(name = "Socket Index")
-
-    # pose specific
-    bone_name : bpy.props.StringProperty(name = "Bone Name")
+    fcurve_group : bpy.props.StringProperty()
 
     # handles
     handle_left : bpy.props.FloatVectorProperty(
@@ -141,6 +129,11 @@ class PUPT_PR_properties(bpy.types.PropertyGroup) :
             ),
         default = "PARENT",
         )
+
+    additive_keyframing : bpy.props.BoolProperty(
+        name = "Additive Keyframing",
+        description = "Paste Keyframes according to current value of FCurve",
+    )
 
     bypass_update_tag : bpy.props.BoolProperty()
     

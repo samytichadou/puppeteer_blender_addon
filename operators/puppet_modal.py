@@ -5,6 +5,7 @@ import blf
 from .. import event_list
 from ..addon_prefs import get_addon_preferences
 from ..gui import return_active_set_automation
+from .automation_set_actions import get_unique_name
 
 
 # draw text line from fontid
@@ -25,7 +26,7 @@ def draw_puppet_helper_callback_px(self, context):
     paste_mode = props.paste_mode
     a_set, a_automation = return_active_set_automation(context)
     
-    if self._modifier_shift:
+    if props.additive_keyframing:
         keyframing_mode = "ADDITIVE"
     else:
         keyframing_mode = "NORMAL"
@@ -59,9 +60,9 @@ def draw_puppet_helper_callback_px(self, context):
         l_pos += line_offset
         draw_text_line(font_id, right_mg, l_pos, "Shift - Additive Keyframing")
         l_pos += line_offset
-        draw_text_line(font_id, right_mg, l_pos, "Down Arrow - Automation Set")
+        draw_text_line(font_id, right_mg, l_pos, "Up/Down - Automation Set")
         l_pos += line_offset
-        draw_text_line(font_id, right_mg, l_pos, "Up Arrow - Paste Mode")
+        draw_text_line(font_id, right_mg, l_pos, "Ctrl - Paste Mode")
 
         l_pos += 5
         for a in reversed(a_set.automation):
@@ -71,15 +72,22 @@ def draw_puppet_helper_callback_px(self, context):
                 blf.draw(font_id, "%s - %s" % (a.key_assignment, a.name))
 
 
-def change_active_set(context):
+def change_active_set(context, direction):
 
     props = context.scene.pupt_properties
     idx = props.automation_set_index
     
-    if idx < len(props.automation_set) - 1:
-        props.automation_set_index += 1
-    elif idx == len(props.automation_set) - 1:
-        props.automation_set_index = 0
+    if direction == "up":
+        if idx == 0:
+            props.automation_set_index = len(props.automation_set) - 1
+        else:
+            props.automation_set_index -= 1
+
+    elif direction == "dwn":
+        if idx < len(props.automation_set) - 1:
+            props.automation_set_index += 1
+        elif idx == len(props.automation_set) - 1:
+            props.automation_set_index = 0
 
 
 def change_paste_mode(context):
@@ -99,32 +107,16 @@ def change_paste_mode(context):
         props["paste_mode"] = 0
 
 
-def get_properties_value_for_keyframe(value, keyframe, dimension):
-
-    if dimension == 0:
-        value = keyframe.fcurve_value
-    else:
-        value[keyframe.fcurve_array_index] = keyframe.fcurve_value
-    
-    return value
-
-
-def get_additive_properties_value_for_keyframe(value, keyframe, dimension):
-    
-    if dimension == 0:
-        value += keyframe.fcurve_additive_value
-    else:
-        value[keyframe.fcurve_array_index] += keyframe.fcurve_additive_value
-
-    return value
-
-
 def create_keyframe_from_parent(keyframe, current_frame, additive):
 
     if not keyframe.parent_name:
+        print("Puppeteer --- Skip keyframe without parent name") #debug
         return
 
+    print("Puppeteer --- Pasting keyframe") #debug
+    
     # get direct parent
+    parent = None
     if keyframe.parent_type == "OBJECT":
         parent = bpy.data.objects[keyframe.parent_name]
     elif keyframe.parent_type == "MATERIAL":
@@ -137,38 +129,48 @@ def create_keyframe_from_parent(keyframe, current_frame, additive):
             parent = bpy.data.materials[keyframe.parent_name].node_tree
         elif keyframe.parent_type == "WORLD_NTREE":
             parent = bpy.data.worlds[keyframe.parent_name].node_tree
-        if keyframe.socket_type == "INPUTS":
-            parent = parent.nodes[keyframe.node_name].inputs[keyframe.socket_index]
-        else:
-            parent = parent.nodes[keyframe.node_name].outputs[keyframe.socket_index]
-    # pose
-    elif keyframe.parent_type == "OBJECT_POSE":
-        parent = bpy.data.objects[keyframe.parent_name].pose.bones[keyframe.bone_name]
 
-    # set value for the keyframes additive and normal
-    dim = parent.bl_rna.properties[keyframe.fcurve_data_path].array_length
-    old_value = getattr(parent, keyframe.fcurve_data_path)
+    if parent is None:
+        print("Puppeteer --- Skip keyframe, unable to find parent") #debug
+        return
 
-    if not additive:
-        value = get_properties_value_for_keyframe(old_value, keyframe, dim)
+    print("Puppeteer --- Parent to paste %s" % parent.name) #debug
+
+    # find fcurve
+    if parent.animation_data is None:
+        parent.animation_data_create()
+    a_d = parent.animation_data
+
+    if a_d.action is None:
+        new_name = get_unique_name(bpy.data.actions, parent.name + "Action")
+        a_d.action = bpy.data.actions.new(new_name)
+
+    fc = a_d.action.fcurves.find(keyframe.fcurve_data_path, index = keyframe.fcurve_array_index)
+    if fc is None:
+        fc = a_d.action.fcurves.new(keyframe.fcurve_data_path, index = keyframe.fcurve_array_index, action_group = keyframe.fcurve_group)
+    print("Puppeteer --- Fcurve to paste %s" % fc.data_path) #debug
+
+    # process value
+    if additive:
+        value = fc.evaluate(current_frame) + keyframe.fcurve_additive_value
     else:
-        value = get_additive_properties_value_for_keyframe(old_value, keyframe, dim)
-    setattr(parent, keyframe.fcurve_data_path, value)
+        value = keyframe.fcurve_value
+    print("Puppeteer --- Value to paste %f" % value) #debug
 
-    # set kframes
-    if dim == 0:
-        parent.keyframe_insert(
-            keyframe.fcurve_data_path,
-            frame = current_frame + keyframe.fcurve_frame,
-            )
-    else:
-        parent.keyframe_insert(
-            keyframe.fcurve_data_path,
-            index = keyframe.fcurve_array_index,
-            frame = current_frame + keyframe.fcurve_frame,
-            )
+    new_key = fc.keyframe_points.insert(
+        current_frame + keyframe.fcurve_frame,
+        value
+        )
+    print("Puppeteer --- Setting pasted keyframe") #debug
 
-    setattr(parent, keyframe.fcurve_data_path, old_value)
+    new_key.handle_left[0] = current_frame + keyframe.handle_left[0]
+    new_key.handle_left[1] = value + keyframe.handle_left[1]
+    new_key.handle_left_type = keyframe.handle_left_type
+    new_key.handle_right[0] = current_frame + keyframe.handle_right[0]
+    new_key.handle_right[1] = value + keyframe.handle_right[1]
+    new_key.handle_right_type = keyframe.handle_right_type
+
+    print("Puppeteer --- Keyframe set") #debug
 
 
 class PUPT_OT_Puppet_Modal(bpy.types.Operator):
@@ -177,7 +179,6 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
     bl_label = "Puppet"
     bl_options = {"UNDO"} #, "INTERNAL"}
 
-    _modifier_shift = False
     _event = None
 
     show_help : bpy.props.BoolProperty(default = True)
@@ -206,7 +207,7 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
 
         for kf in automation.keyframe:
             if props.paste_mode == "PARENT":
-                create_keyframe_from_parent(kf, current_frame, self._modifier_shift)
+                create_keyframe_from_parent(kf, current_frame, props.additive_keyframing)
 
         for area in context.screen.areas:
             area.tag_redraw()
@@ -216,6 +217,7 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
 
     def modal(self, context, event):
         context.area.tag_redraw()
+        props = context.scene.pupt_properties
         
         # special shortcuts
         if event.type in event_list.shortcut_event and event.value == "PRESS":
@@ -231,33 +233,33 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
                     bpy.ops.screen.animation_cancel(restore_frame = False)
             # DWN ARROW
             elif event.type == "DOWN_ARROW":
-                change_active_set(context)
+                change_active_set(context, "dwn")
             # UP ARROW
             elif event.type == "UP_ARROW":
-                change_paste_mode(context)
+                change_active_set(context, "up")
             # H
             elif event.type == "H":
                 self.show_help = not self.show_help
+            # CTL
+            elif event.type in {"LEFT_CTRL", "RIGHT_CTRL"}:
+                change_paste_mode(context)
+            # SHIFT
+            elif event.type in {"LEFT_SHIFT", "RIGHT_SHIFT"}:
+                # toggle additive
+                if get_addon_preferences().hold_additive:
+                    # hold shift to additive
+                    if event.value == "PRESS":
+                        props.additive_keyframing = True
+                    elif event.value == "RELEASE":
+                        props.additive_keyframing = False
+                else:
+                    if event.value == "PRESS":
+                        props.additive_keyframing = not props.additive_keyframing
 
         # action
         elif event.type in event_list.used_event and event.value == "PRESS":
             self._event = event.type
             self.execute(context)
-
-        # modifiers
-        elif event.type in event_list.modifier_event:
-            # SHIFT modifier
-            if event.type in {"LEFT_SHIFT", "RIGHT_SHIFT"}:
-                # toggle additive
-                if get_addon_preferences().hold_additive:
-                    # hold shift to additive
-                    if event.value == "PRESS":
-                        self._modifier_shift = True
-                    elif event.value == "RELEASE":
-                        self._modifier_shift = False
-                else:
-                    if event.value == "PRESS":
-                        self._modifier_shift = not self._modifier_shift
 
         # passtrough
         elif event.type in event_list.passthrough_event:
@@ -280,6 +282,7 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
+
 
     def finish(self, context):
         bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')

@@ -1,8 +1,8 @@
 import bpy
 
 
-#add item to collection property
-def add_item_to_collection(collection, base_name):
+# get unique name
+def get_unique_name(collection, base_name):
 
     #check for dupes
     old_names = []
@@ -15,6 +15,14 @@ def add_item_to_collection(collection, base_name):
     while new_name in old_names:
         new_name = base_name + "_" + str(count).zfill(3)
         count += 1
+
+    return new_name
+
+
+#add item to collection property
+def add_item_to_collection(collection, base_name):
+
+    new_name = get_unique_name(collection, base_name)
 
     #add
     new_set = collection.add()
