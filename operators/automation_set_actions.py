@@ -58,7 +58,7 @@ class PUPT_OT_Automation_Set_Actions(bpy.types.Operator):
 
         # add
         if self.action == "ADD":
-            add_item_to_collection(sets, "new_set")
+            add_item_to_collection(sets, "new set")
 
             pupt_props.automation_set_index = len(sets) - 1
 

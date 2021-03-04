@@ -168,8 +168,8 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
         name = "Automation Set",
         items = automation_set_callback,
         )
-    new_automation_set_name : bpy.props.StringProperty(name = "Set name", default = "new_set")
-    automation_name : bpy.props.StringProperty(name = "Automation name", default = "new_automation")
+    new_automation_set_name : bpy.props.StringProperty(name = "Set name", default = "new set")
+    automation_name : bpy.props.StringProperty(name = "Automation name", default = "new automation")
     key_assignment : bpy.props.EnumProperty(
         name = "Key Assignment",
         items = key_assignment_callback,
