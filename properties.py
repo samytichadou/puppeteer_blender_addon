@@ -31,7 +31,7 @@ def popup_message_box(message, title, icon):
 def key_assignment_update(self, context):
 
     props = context.scene.pupt_properties
-    if props.bypass_update_tag:
+    if props.bypass_update_tag or self.key_assignment == "NONE":
         return
 
     set_string = self.path_from_id().split(".automation[")[0]
@@ -44,7 +44,7 @@ def key_assignment_update(self, context):
                 self.key_assignment = "NONE"
                 props.bypass_update_tag = False
 
-                popup_message_box("%s used by automation : %s" % (a.key_assignment, a.name), "Unavailable Key", "INFO")
+                popup_message_box("Already used by automation : %s" % a.name, "%s - Unavailable Key" % a.key_assignment, "INFO")
 
                 break
 
