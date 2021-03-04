@@ -36,15 +36,15 @@ def draw_puppet_helper_callback_px(self, context):
     line_offset = int(15 * size_coef)
 
     # right margin
-    right_mg = 15
+    right_mg = self._mouse_x
 
     blf.color(0, *col)
     blf.size(font_id, size, 72)
 
-    l_pos = 15
+    l_pos = self._mouse_y
     draw_text_line(font_id, right_mg, l_pos, "Puppeteer    H - Toggle Help")
 
-    if self.show_help:
+    if self._show_help:
         
         l_pos += 5
         l_pos += line_offset
@@ -58,7 +58,9 @@ def draw_puppet_helper_callback_px(self, context):
         l_pos += line_offset
         draw_text_line(font_id, right_mg, l_pos, "Esc/Enter - Quit")
         l_pos += line_offset
-        draw_text_line(font_id, right_mg, l_pos, "Alt - Additive Keyframing")
+        draw_text_line(font_id, right_mg, l_pos, "Alt R - Move Help")
+        l_pos += line_offset
+        draw_text_line(font_id, right_mg, l_pos, "Alt L - Additive Keyframing")
         l_pos += line_offset
         draw_text_line(font_id, right_mg, l_pos, "Up/Down - Automation Set")
         l_pos += line_offset
@@ -286,7 +288,11 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
 
     _event = None
 
-    show_help : bpy.props.BoolProperty(default = True)
+    _move_modifier = False
+    _mouse_x = 15
+    _mouse_y = 15
+
+    _show_help = True
 
     @classmethod
     def poll(cls, context):
@@ -346,13 +352,13 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
             elif event.type == "UP_ARROW" and event.value == "PRESS":
                 change_active_set(context, "up")
             # H
-            elif event.type == "H":
-                self.show_help = not self.show_help
+            elif event.type == "H" and event.value == "PRESS":
+                self._show_help = not self._show_help
             # TAB
             elif event.type == "TAB" and event.value == "PRESS":
                 change_paste_mode(context)
-            # ALT
-            elif event.type in {"LEFT_ALT", "RIGHT_ALT"}:
+            # ALT LEFT
+            elif event.type == "LEFT_ALT":
                 # toggle additive
                 if get_addon_preferences().hold_additive:
                     # hold shift to additive
@@ -363,11 +369,24 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
                 else:
                     if event.value == "PRESS":
                         props.additive_keyframing = not props.additive_keyframing
+            # ALT RIGHT
+            elif event.type == "RIGHT_ALT":
+                if event.value == "PRESS":
+                    self._move_modifier = True
+                    self._mouse_x = event.mouse_region_x
+                    self._mouse_y = event.mouse_region_y
+                elif event.value == "RELEASE":
+                    self._move_modifier = False
 
         # action
         elif event.type in event_list.used_event and event.value == "PRESS":
             self._event = event.type
             self.execute(context)
+
+        # mouse move
+        elif self._move_modifier and event.type == 'MOUSEMOVE':
+            self._mouse_x = event.mouse_region_x
+            self._mouse_y = event.mouse_region_y
 
         # passtrough
         elif event.type in event_list.passthrough_event:
