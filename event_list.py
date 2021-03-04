@@ -219,7 +219,6 @@ passthrough_event = [
     "WHEELOUTMOUSE",
 
     "MIDDLEMOUSE", 
-
     "LEFTMOUSE",
     "RIGHTMOUSE",
     "BUTTON4MOUSE",
