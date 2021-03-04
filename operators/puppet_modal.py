@@ -330,7 +330,10 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
 
 
     def modal(self, context, event):
-        context.area.tag_redraw()
+        for area in context.screen.areas:
+            if area.type == 'VIEW_3D':
+                area.tag_redraw()
+        # context.area.tag_redraw()
         props = context.scene.pupt_properties
         
         # special shortcuts
@@ -419,6 +422,7 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
     def finish(self, context):
         if get_addon_preferences().hold_additive:
             context.scene.pupt_properties.additive_keyframing = self._old_additive
+
         bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
 
 
