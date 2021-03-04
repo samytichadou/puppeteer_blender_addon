@@ -267,7 +267,6 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
         for area in context.screen.areas:
             area.tag_redraw()
 
-
         return {'FINISHED'}
 
 
