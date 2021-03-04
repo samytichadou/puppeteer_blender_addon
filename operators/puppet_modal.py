@@ -16,7 +16,7 @@ def draw_text_line(font_id, right_pos, up_pos, text):
 
 # draw puppet helper
 def draw_puppet_helper_callback_px(self, context):
-    font_id = 0  # XXX, need to find out how best to get this.
+    font_id = 0
     
     prefs = get_addon_preferences()
     col = prefs.ui_text_color
