@@ -18,6 +18,15 @@ def key_assignment_callback(scene, context):
     return items
 
 
+# draw popup message box
+def popup_message_box(message, title, icon):
+
+    def draw(self, context):
+        self.layout.label(text=message)
+
+    bpy.context.window_manager.popup_menu(draw, title = title, icon = icon)
+
+
 # avoid dupe key assignment
 def key_assignment_update(self, context):
 
@@ -34,6 +43,9 @@ def key_assignment_update(self, context):
                 props.bypass_update_tag = True
                 self.key_assignment = "NONE"
                 props.bypass_update_tag = False
+
+                popup_message_box("%s used by automation : %s" % (a.key_assignment, a.name), "Unavailable Key", "INFO")
+
                 break
 
 
