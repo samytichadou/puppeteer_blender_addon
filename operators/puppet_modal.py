@@ -265,7 +265,9 @@ def set_keyframe_from_paste_mode(keyframe, current_frame, additive, paste_mode):
 
     # process value
     if additive:
-        value = fc.evaluate(current_frame) + keyframe.fcurve_additive_value
+        original_value = fc.evaluate(current_frame)
+        if debug: print("Puppeteer --- Original value %f" % original_value) #debug
+        value = original_value + keyframe.fcurve_additive_value
     else:
         value = keyframe.fcurve_value
 
