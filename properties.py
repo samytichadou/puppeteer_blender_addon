@@ -41,10 +41,10 @@ def key_assignment_update(self, context):
         if a != self:
             if a.key_assignment == self.key_assignment:
                 props.bypass_update_tag = True
-                self.key_assignment = "NONE"
+                a.key_assignment = "NONE"
                 props.bypass_update_tag = False
 
-                popup_message_box("Already used by automation : %s" % a.name, "%s - Unavailable Key" % a.key_assignment, "INFO")
+                popup_message_box("Automation assigned to NONE", "%s - %s Unbinding" % (a.name, self.key_assignment), "INFO")
 
                 break
 
