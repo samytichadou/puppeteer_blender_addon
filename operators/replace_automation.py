@@ -55,7 +55,11 @@ class PUPT_OT_Replace_Automation(bpy.types.Operator):
         if context.visible_fcurves:
             for fc in context.visible_fcurves:
                 if create_automation.return_selected_keyframes(fc):
-                    return True
+                    props = context.scene.pupt_properties
+                    if props.automation_set:
+                        for a_set in props.automation_set:
+                            if a_set.automation:
+                                return True
  
     def invoke(self, context, event):
         a_set, a_automation = return_active_set_automation(context)
