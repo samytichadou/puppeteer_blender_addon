@@ -211,6 +211,7 @@ class PUPT_MT_dopesheet_automation_menu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator("pupt.create_automation")
+        layout.operator("pupt.replace_automation")
 
 
 # key menu entry for creating automation
