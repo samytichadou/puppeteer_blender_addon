@@ -213,6 +213,21 @@ def set_keyframe(fcurve, value, keyframe_from_coll, current_frame):
     new_key.handle_right_type = keyframe_from_coll.handle_right_type
 
 
+# process original value
+def process_original_value(parent, fcurve, data_path, array_index, current_frame):
+
+    if not fcurve.keyframe_points:
+        data = parent.id_data.path_resolve(data_path)
+        try:
+            value = data[array_index]
+        except TypeError:
+            value = data
+    else:
+        value = fcurve.evaluate(current_frame)
+
+    return value
+
+
 def set_keyframe_from_paste_mode(keyframe, current_frame, additive, paste_mode):
     
     debug = get_addon_preferences().debug
@@ -265,7 +280,7 @@ def set_keyframe_from_paste_mode(keyframe, current_frame, additive, paste_mode):
 
     # process value
     if additive:
-        original_value = fc.evaluate(current_frame)
+        original_value = process_original_value(parent, fc, keyframe.fcurve_data_path, keyframe.fcurve_array_index, current_frame)
         if debug: print("Puppeteer --- Original value %f" % original_value) #debug
         value = original_value + keyframe.fcurve_additive_value
     else:
