@@ -2,6 +2,7 @@ import bpy
 
 
 from .automation_set_actions import add_item_to_collection
+from ..gui import return_active_set_automation
 from ..properties import key_assignment_callback
 from ..addon_prefs import get_addon_preferences
 
@@ -110,6 +111,8 @@ def add_keyframes_to_collection(context, collection):
             if debug: print("Puppeteer --- FCurve type not supported") #debug
             continue
 
+        if debug: print("Puppeteer --- Getting keyframes for parent : %s from action : %s" % (parent_action.name, fc.id_data.name)) #debug
+
         automation_check = True
 
         for kf in fc_keyframes:
@@ -183,12 +186,10 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
                     return True
  
     def invoke(self, context, event):
-        pupt_props = context.scene.pupt_properties
-        idx = pupt_props.automation_set_index
-        sets = pupt_props.automation_set
+        a_set, a_automation = return_active_set_automation(context)
 
-        if idx in range(0,len(sets)):
-            self.automation_set = context.scene.pupt_properties.automation_set[pupt_props.automation_set_index].name
+        if a_set is not None:
+            self.automation_set = a_set.name
 
         return context.window_manager.invoke_props_dialog(self)
  
