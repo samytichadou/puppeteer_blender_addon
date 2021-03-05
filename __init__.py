@@ -48,6 +48,7 @@ from .operators import (
     automation_set_actions,
     automation_actions,
     create_automation,
+    replace_automation,
     puppet_modal,
     check_new_version,
     assign_key,
@@ -69,6 +70,7 @@ def register():
     automation_set_actions.register()
     automation_actions.register()
     create_automation.register()
+    replace_automation.register()
     puppet_modal.register()
     check_new_version.register()
     assign_key.register()
@@ -84,6 +86,7 @@ def unregister():
     automation_set_actions.unregister()
     automation_actions.unregister()
     create_automation.unregister()
+    replace_automation.unregister()
     puppet_modal.unregister()
     check_new_version.unregister()
     assign_key.unregister()
