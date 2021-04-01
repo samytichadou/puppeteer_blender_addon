@@ -22,10 +22,10 @@ bl_info = {
     "name": "Puppeteer",
     "description": "Automation for animation",
     "author": "Samy Tichadou (tonton)",
-    "version": (0, 1, 0),
-    "blender": (2, 91, 2),
+    "version": (0, 2, 0),
+    "blender": (2, 93, 0),
     "location": "Sidebar > Puppeteer",
-    "warning": "",
+    "warning": "Beta Version. Use at your own risk.",
     "doc_url": "https://github.com/samytichadou/puppeteer_blender_addon",
     "tracker_url": "https://github.com/samytichadou/puppeteer_blender_addon/issues/new",
     "category": "Animation" }
