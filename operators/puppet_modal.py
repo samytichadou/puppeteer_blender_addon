@@ -350,7 +350,7 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
         for area in context.screen.areas:
             if area.type == 'VIEW_3D':
                 area.tag_redraw()
-        # context.area.tag_redraw()
+
         props = context.scene.pupt_properties
         
         # special shortcuts
