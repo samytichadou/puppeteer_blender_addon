@@ -146,6 +146,7 @@ class PUPT_PR_properties(bpy.types.PropertyGroup) :
     additive_keyframing : bpy.props.BoolProperty(
         name = "Additive Keyframing",
         description = "Paste Keyframes according to current value of FCurve",
+        default = True,
     )
 
     bypass_update_tag : bpy.props.BoolProperty()
