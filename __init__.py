@@ -52,6 +52,7 @@ from .operators import (
     puppet_modal,
     check_new_version,
     assign_key,
+    remove_keyframe,
 )
 
 
@@ -74,6 +75,7 @@ def register():
     puppet_modal.register()
     check_new_version.register()
     assign_key.register()
+    remove_keyframe.register()
 
 def unregister():
 
@@ -90,3 +92,4 @@ def unregister():
     puppet_modal.unregister()
     check_new_version.unregister()
     assign_key.unregister()
+    remove_keyframe.unregister()

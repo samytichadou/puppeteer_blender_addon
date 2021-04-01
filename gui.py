@@ -148,6 +148,8 @@ class PUPT_PT_viewport_keyframes_subpanel(bpy.types.Panel):
 
         layout.template_list("PUPT_UL_keyframes", "", a_automation, "keyframe", a_automation, "keyframe_index", rows = 2)
 
+        layout.operator("pupt.remove_keyframe")
+
 
 # keyframe properties subpanel
 class PUPT_PT_viewport_keyframes_properties_subpanel(bpy.types.Panel):
