@@ -46,10 +46,11 @@ class PUPT_PT_viewport_panel(bpy.types.Panel):
         draw_update_needed_warning(layout, props)
 
         # general
-        layout.operator("pupt.puppet_modal")
-       
-        layout.prop(props, "paste_mode", text = "Paste")
-        layout.prop(props, "additive_keyframing")
+        layout.operator("pupt.puppet_modal", icon = "ARMATURE_DATA")
+
+        row = layout.row(align=True)
+        row.operator("pupt.puppet_modal", text="Paste", icon="PASTEDOWN")
+        row.popover(panel="PUPT_PT_settings_panel", text="", icon="SETTINGS")
 
         # sets
         layout.label(text = "Automation Sets")
@@ -71,7 +72,22 @@ class PUPT_PT_viewport_panel(bpy.types.Panel):
             if not props.automation_set[props.automation_set_index].automation:
 
                 layout.label(text = "No Automations")
-           
+
+
+# main panel
+class PUPT_PT_settings_panel(bpy.types.Panel):
+    bl_label = "Settings"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_ui_units_x = 8
+
+    def draw(self, context):
+        props = context.scene.pupt_properties
+
+        layout = self.layout
+        layout.prop(props, "paste_mode", text = "")
+        layout.prop(props, "additive_keyframing")
+
 
 # automation subpanel 
 class PUPT_PT_viewport_automations_subpanel(bpy.types.Panel):
@@ -148,7 +164,7 @@ class PUPT_PT_viewport_keyframes_subpanel(bpy.types.Panel):
 
         layout.template_list("PUPT_UL_keyframes", "", a_automation, "keyframe", a_automation, "keyframe_index", rows = 2)
 
-        layout.operator("pupt.remove_keyframe")
+        layout.operator("pupt.remove_keyframe", text="Remove", icon="REMOVE")
 
 
 # keyframe properties subpanel
@@ -233,6 +249,7 @@ def draw_timeline_menu(self, context):
 
 def register():
     bpy.utils.register_class(PUPT_PT_viewport_panel)
+    bpy.utils.register_class(PUPT_PT_settings_panel)   
     bpy.utils.register_class(PUPT_PT_viewport_automations_subpanel)
     bpy.utils.register_class(PUPT_PT_viewport_keyframes_subpanel)
     bpy.utils.register_class(PUPT_PT_viewport_keyframes_properties_subpanel)
@@ -244,6 +261,7 @@ def register():
 
 def unregister():
     bpy.utils.unregister_class(PUPT_PT_viewport_panel)
+    bpy.utils.unregister_class(PUPT_PT_settings_panel)
     bpy.utils.unregister_class(PUPT_PT_viewport_automations_subpanel)
     bpy.utils.unregister_class(PUPT_PT_viewport_keyframes_subpanel)
     bpy.utils.unregister_class(PUPT_PT_viewport_keyframes_properties_subpanel)
