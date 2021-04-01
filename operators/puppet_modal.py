@@ -356,7 +356,7 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
         # special shortcuts
         if event.type in event_list.shortcut_event:
             # ESC
-            if event.type == 'ESC' and event.value == "PRESS":
+            if event.type in {'ESC', 'NUMPAD_ENTER', 'RET'}:
                 self.finish(context)
                 return {'FINISHED'}
             # SPACE

@@ -58,7 +58,6 @@ used_event = [
     "APP",
     "GRLESS",
 
-    "RET",
     "LINE_FEED",
     "BACK_SPACE",
     "DEL",
@@ -92,7 +91,6 @@ used_event = [
     "NUMPAD_ASTERIX",
     "NUMPAD_0",
     "NUMPAD_MINUS",
-    "NUMPAD_ENTER",
     "NUMPAD_PLUS",
 
     "F1",
@@ -184,6 +182,9 @@ shortcut_event = [
 
     "ESC",
     "SPACE",
+
+    "NUMPAD_ENTER",
+    "RET",
 
     "DOWN_ARROW",
     "UP_ARROW",
