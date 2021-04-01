@@ -8,9 +8,7 @@ from .automation_set_actions import add_item_to_collection
 # enum callback for automation set
 def automation_set_callback(scene, context):
 
-    items = [
-        ('CREATE_NEW', "Create New", ""),
-    ]
+    items = []
 
     a_set, a_automation = return_active_set_automation(context)
 
@@ -19,6 +17,8 @@ def automation_set_callback(scene, context):
         if a_set is not None and a_set == a_s:
             continue
         items.append((a_s.name, a_s.name, ""))
+
+    items.append(('CREATE_NEW', "Create New", ""))
 
     return items
 
