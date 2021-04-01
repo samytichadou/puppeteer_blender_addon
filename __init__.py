@@ -54,6 +54,7 @@ from .operators import (
     assign_key,
     remove_keyframe,
     paste_automation,
+    copy_automation,
 )
 
 
@@ -78,6 +79,7 @@ def register():
     assign_key.register()
     remove_keyframe.register()
     paste_automation.register()
+    copy_automation.register()
 
 def unregister():
 
@@ -96,3 +98,4 @@ def unregister():
     assign_key.unregister()
     remove_keyframe.unregister()
     paste_automation.unregister()
+    copy_automation.unregister()
