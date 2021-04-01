@@ -74,7 +74,7 @@ class PUPT_PT_viewport_panel(bpy.types.Panel):
                 layout.label(text = "No Automations")
 
 
-# main panel
+# popover paste settings panel
 class PUPT_PT_settings_panel(bpy.types.Panel):
     bl_label = "Settings"
     bl_space_type = "VIEW_3D"
@@ -85,6 +85,7 @@ class PUPT_PT_settings_panel(bpy.types.Panel):
         props = context.scene.pupt_properties
 
         layout = self.layout
+        layout.label(text="Paste Settings")
         layout.prop(props, "paste_mode", text = "")
         layout.prop(props, "additive_keyframing")
 
