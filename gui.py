@@ -98,7 +98,7 @@ class PUPT_MT_automation_menu(bpy.types.Menu):
         layout = self.layout
 
         layout.operator("pupt.copy_automation", icon="COPYDOWN", text="Copy/Cut")
-        layout.operator("pupt.copy_automation", icon="DUPLICATE", text="Duplicate")
+        layout.operator("pupt.duplicate_automation", icon="DUPLICATE", text="Duplicate")
 
 
 # automation subpanel 
