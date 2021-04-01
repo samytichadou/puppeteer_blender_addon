@@ -24,6 +24,7 @@ used_event = [
     "E",
     "F",
     "G",
+    "H",
     "I",
     "J",
     "K",
@@ -93,9 +94,6 @@ used_event = [
     "NUMPAD_MINUS",
     "NUMPAD_PLUS",
 
-    "F1",
-    "F2",
-    "F3",
     "F4",
     "F5",
     "F6",
@@ -189,7 +187,11 @@ shortcut_event = [
     "DOWN_ARROW",
     "UP_ARROW",
 
-    "H",
+    
+
+    "F1",
+    "F2",
+    "F3",
 
     "LEFT_ALT",
     "RIGHT_ALT",

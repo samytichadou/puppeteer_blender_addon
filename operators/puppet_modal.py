@@ -42,9 +42,11 @@ def draw_puppet_helper_callback_px(self, context):
     blf.size(font_id, size, 72)
 
     l_pos = self._mouse_y
-    draw_text_line(font_id, right_mg, l_pos, "Puppeteer    H - Toggle Help")
+    draw_text_line(font_id, right_mg, l_pos, "F1 - Automations    F2 - Help    F3 - Settings")
+    l_pos += line_offset
+    draw_text_line(font_id, right_mg, l_pos, "Puppeteer")
 
-    if self._show_help:
+    if self._show_settings:
         
         l_pos += 5
         l_pos += line_offset
@@ -53,6 +55,8 @@ def draw_puppet_helper_callback_px(self, context):
         draw_text_line(font_id, right_mg, l_pos, "Puppet Set - %s" % a_set.name)
         l_pos += line_offset
         draw_text_line(font_id, right_mg, l_pos, "Keyframing - %s" % keyframing_mode)
+
+    if self._show_help:
 
         l_pos += 5
         l_pos += line_offset
@@ -65,6 +69,8 @@ def draw_puppet_helper_callback_px(self, context):
         draw_text_line(font_id, right_mg, l_pos, "Up/Down - Automation Set")
         l_pos += line_offset
         draw_text_line(font_id, right_mg, l_pos, "Tab - Paste Mode")
+
+    if self._show_automations:
 
         l_pos += 5
         for a in reversed(a_set.automation):
@@ -310,6 +316,8 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
     _mouse_y = 15
 
     _show_help = True
+    _show_automations = True
+    _show_settings = True
 
     @classmethod
     def poll(cls, context):
@@ -370,9 +378,15 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
             # UP ARROW
             elif event.type == "UP_ARROW" and event.value == "PRESS":
                 change_active_set(context, "up")
-            # H
-            elif event.type == "H" and event.value == "PRESS":
+            # AUTOMATIONS
+            elif event.type == "F1" and event.value == "PRESS":
+                self._show_automations = not self._show_automations
+            # HELP
+            elif event.type == "F2" and event.value == "PRESS":
                 self._show_help = not self._show_help
+            # SETTINGS
+            elif event.type == "F3" and event.value == "PRESS":
+                self._show_settings = not self._show_settings
             # TAB
             elif event.type == "TAB" and event.value == "PRESS":
                 change_paste_mode(context)
