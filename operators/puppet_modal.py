@@ -334,7 +334,6 @@ class PUPT_OT_Puppet_Modal(bpy.types.Operator):
             return
 
         for kf in automation.keyframe:
-            chk_paste = True
             chk_paste = set_keyframe_from_paste_mode(kf, current_frame, props.additive_keyframing, props.paste_mode)
 
             if not chk_paste:
