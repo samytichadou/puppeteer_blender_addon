@@ -18,17 +18,16 @@ class PUPT_OT_Remove_Keyframe(bpy.types.Operator):
     def execute(self, context):
         
         pupt_props = context.scene.pupt_properties
-        active_set = pupt_props.automation_set[pupt_props.automation_set_index]
-        active_automation = active_set.automation[active_set.automation_index]
+        a_set, a_automation = return_active_set_automation(context)
 
-        keyframes = active_automation.keyframe
-        idx = active_automation.keyframe_index
+        keyframes = a_automation.keyframe
+        idx = a_automation.keyframe_index
 
         # remove
         keyframes.remove(idx)
 
         if idx != 0:
-            active_automation.keyframe_index -= 1
+            a_automation.keyframe_index -= 1
         
         self.report({'INFO'}, "Automation removed")
 
