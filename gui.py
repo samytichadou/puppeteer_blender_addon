@@ -49,7 +49,7 @@ class PUPT_PT_viewport_panel(bpy.types.Panel):
         layout.operator("pupt.puppet_modal", icon = "ARMATURE_DATA")
 
         row = layout.row(align=True)
-        row.operator("pupt.puppet_modal", text="Paste", icon="PASTEDOWN")
+        row.operator("pupt.paste_automation", text="Paste", icon="PASTEDOWN")
         row.popover(panel="PUPT_PT_settings_panel", text="", icon="SETTINGS")
 
         # sets

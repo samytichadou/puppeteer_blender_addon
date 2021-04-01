@@ -53,6 +53,7 @@ from .operators import (
     check_new_version,
     assign_key,
     remove_keyframe,
+    paste_automation,
 )
 
 
@@ -76,6 +77,7 @@ def register():
     check_new_version.register()
     assign_key.register()
     remove_keyframe.register()
+    paste_automation.register()
 
 def unregister():
 
@@ -93,3 +95,4 @@ def unregister():
     check_new_version.unregister()
     assign_key.unregister()
     remove_keyframe.unregister()
+    paste_automation.unregister()
