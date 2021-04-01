@@ -90,6 +90,17 @@ class PUPT_PT_settings_panel(bpy.types.Panel):
         layout.prop(props, "additive_keyframing")
 
 
+
+class PUPT_MT_automation_menu(bpy.types.Menu):
+    bl_label = "Automation Specials"
+
+    def draw(self, _context):
+        layout = self.layout
+
+        layout.operator("pupt.copy_automation", icon="COPYDOWN", text="Copy/Cut")
+        layout.operator("pupt.copy_automation", icon="DUPLICATE", text="Duplicate")
+
+
 # automation subpanel 
 class PUPT_PT_viewport_automations_subpanel(bpy.types.Panel):
     bl_label = ""
@@ -117,10 +128,12 @@ class PUPT_PT_viewport_automations_subpanel(bpy.types.Panel):
 
         row = layout.row()
 
-        row.template_list("PUPT_UL_automation", "", active_set, "automation", active_set, "automation_index", rows = 3)
+        row.template_list("PUPT_UL_automation", "", active_set, "automation", active_set, "automation_index", rows = 4)
 
         col = row.column(align=True)
         col.operator("pupt.automation_actions", icon='REMOVE', text="").action = 'REMOVE'
+        col.separator()
+        col.menu("PUPT_MT_automation_menu", icon="DOWNARROW_HLT", text="")
         col.separator()
         col.operator("pupt.automation_actions", icon='TRIA_UP', text="").action = 'UP'
         col.operator("pupt.automation_actions", icon='TRIA_DOWN', text="").action = 'DOWN'
@@ -250,7 +263,8 @@ def draw_timeline_menu(self, context):
 
 def register():
     bpy.utils.register_class(PUPT_PT_viewport_panel)
-    bpy.utils.register_class(PUPT_PT_settings_panel)   
+    bpy.utils.register_class(PUPT_PT_settings_panel)
+    bpy.utils.register_class(PUPT_MT_automation_menu)
     bpy.utils.register_class(PUPT_PT_viewport_automations_subpanel)
     bpy.utils.register_class(PUPT_PT_viewport_keyframes_subpanel)
     bpy.utils.register_class(PUPT_PT_viewport_keyframes_properties_subpanel)
@@ -263,6 +277,7 @@ def register():
 def unregister():
     bpy.utils.unregister_class(PUPT_PT_viewport_panel)
     bpy.utils.unregister_class(PUPT_PT_settings_panel)
+    bpy.utils.unregister_class(PUPT_MT_automation_menu)
     bpy.utils.unregister_class(PUPT_PT_viewport_automations_subpanel)
     bpy.utils.unregister_class(PUPT_PT_viewport_keyframes_subpanel)
     bpy.utils.unregister_class(PUPT_PT_viewport_keyframes_properties_subpanel)
