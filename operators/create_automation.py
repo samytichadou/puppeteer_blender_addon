@@ -210,11 +210,9 @@ class PUPT_OT_Create_Automation(bpy.types.Operator):
 
         # create new set if needed
         if self.automation_set == "CREATE_NEW":
-            add_item_to_collection(sets, self.new_automation_set_name)
+            active_set = add_item_to_collection(sets, self.new_automation_set_name)
             
             pupt_props.automation_set_index = len(sets) - 1
-
-            active_set = sets[pupt_props.automation_set_index]
 
         else:
             active_set = sets[self.automation_set]
