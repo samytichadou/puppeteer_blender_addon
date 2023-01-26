@@ -131,7 +131,7 @@ def add_keyframes_to_collection(context, collection):
             if fc.group:
                 new_key.fcurve_group = fc.group.name
 
-            new_key.fcurve_frame = kf.co[0]
+            new_key.fcurve_frame = int(kf.co[0])
             new_key.fcurve_value = kf.co[1]
             new_key.fcurve_additive_value = kf.co[1] - init_value
 
@@ -152,7 +152,7 @@ def add_keyframes_to_collection(context, collection):
         origin_frame = min(frames)
         
         for kf in collection.keyframe:
-            kf.fcurve_frame = kf.fcurve_frame - origin_frame
+            kf.fcurve_frame = int(kf.fcurve_frame - origin_frame)
             kf.handle_left[0] = kf.handle_left[0] - origin_frame
             kf.handle_right[0] = kf.handle_right[0] - origin_frame
 
